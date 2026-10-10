@@ -1,0 +1,2588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UNIVERS42 — The Tech Island for 42 Builders</title>
+  <meta name="description" content="Univers42 es un ecosistema y laboratorio de ingeniería open-source forjado en Escuela 42. Shells POSIX, depuradores de memoria, simuladores de exámenes, herramientas de ciberseguridad y engines en Rust.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23050814'/><path d='M22 66 L42 24 L52 24 L52 54 L62 54 L62 66 L52 66 L52 76 L40 76 L40 66 Z' fill='%2300f2fe'/><path d='M62 44 H82 V54 H72 V66 H84 V76 H62 Z' fill='%236366f1'/></svg>">
+  
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       DESIGN SYSTEM & CSS VARIABLES
+       ========================================================================== */
+    :root {
+      --bg-black: #03060f;
+      --bg-main: #060a17;
+      --bg-surface: #0a1024;
+      --bg-surface-elevated: #0f1733;
+      --bg-glass: rgba(10, 16, 36, 0.75);
+      --bg-glass-card: rgba(14, 23, 48, 0.65);
+      --bg-glass-hover: rgba(22, 36, 74, 0.85);
+
+      --cyan-42: #00f2fe;
+      --cyan-glow: rgba(0, 242, 254, 0.4);
+      --cyan-subtle: rgba(0, 242, 254, 0.12);
+
+      --blue-42: #2563eb;
+      --indigo-42: #6366f1;
+      --indigo-glow: rgba(99, 102, 241, 0.4);
+      --purple-42: #a855f7;
+
+      --emerald-42: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.35);
+      --emerald-subtle: rgba(16, 185, 129, 0.12);
+
+      --amber-42: #f59e0b;
+      --amber-subtle: rgba(245, 158, 11, 0.12);
+
+      --rose-42: #f43f5e;
+      --rose-subtle: rgba(244, 63, 94, 0.12);
+
+      --text-white: #ffffff;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --text-cyan: #38bdf8;
+
+      --border-light: rgba(255, 255, 255, 0.08);
+      --border-cyan: rgba(0, 242, 254, 0.28);
+      --border-indigo: rgba(99, 102, 241, 0.3);
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+
+      --font-heading: 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+
+      --shadow-glow: 0 0 35px rgba(0, 242, 254, 0.22);
+      --shadow-card: 0 12px 30px -10px rgba(0, 0, 0, 0.6);
+      --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-black);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at 50% -20%, #0d1e3d 0%, #060a17 45%, #03060f 100%);
+      color: var(--text-primary);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #050814;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+      border: 1px solid var(--border-light);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--cyan-42);
+    }
+
+    /* Interactive Cyber Background Canvas */
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.55;
+    }
+
+    /* Subtle Scanline Overlay */
+    .scanline-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
+      background-size: 100% 4px;
+      opacity: 0.4;
+    }
+
+    /* Container */
+    .container {
+      width: 100%;
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ==========================================================================
+       HEADER & NAVIGATION
+       ========================================================================== */
+    header.site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(6, 10, 23, 0.78);
+      border-bottom: 1px solid var(--border-light);
+      transition: var(--transition-smooth);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 76px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-white);
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #09132b, #132247);
+      border: 1px solid var(--border-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px var(--cyan-glow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand-logo span {
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--cyan-42), #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-name {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand-badge {
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: var(--cyan-subtle);
+      color: var(--cyan-42);
+      border: 1px solid var(--border-cyan);
+      letter-spacing: 0.5px;
+    }
+
+    .brand-tagline {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 0.2px;
+    }
+
+    nav.nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 500;
+      transition: var(--transition-smooth);
+      position: relative;
+      padding: 6px 0;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--cyan-42);
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--cyan-42), var(--indigo-42));
+      transition: var(--transition-smooth);
+      border-radius: 2px;
+    }
+
+    .nav-link:hover::after, .nav-link.active::after {
+      width: 100%;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-audio-toggle {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-light);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition-smooth);
+    }
+
+    .btn-audio-toggle:hover {
+      border-color: var(--cyan-42);
+      color: var(--cyan-42);
+      background: var(--cyan-subtle);
+    }
+
+    .btn-audio-toggle.active {
+      color: var(--cyan-42);
+      border-color: var(--border-cyan);
+      box-shadow: 0 0 10px var(--cyan-glow);
+    }
+
+    .btn-github {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+      border: 1px solid var(--border-light);
+      padding: 8px 16px;
+      border-radius: 10px;
+      color: var(--text-white);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: var(--transition-smooth);
+    }
+
+    .btn-github:hover {
+      border-color: var(--cyan-42);
+      box-shadow: 0 0 20px var(--cyan-glow);
+      transform: translateY(-2px);
+    }
+
+    .btn-github svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    /* Mobile Menu Toggle */
+    .mobile-menu-btn {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text-white);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* ==========================================================================
+       HERO SECTION
+       ========================================================================== */
+    section.hero {
+      padding: 5rem 0 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 16px;
+      border-radius: 100px;
+      background: rgba(0, 242, 254, 0.08);
+      border: 1px solid var(--border-cyan);
+      color: var(--cyan-42);
+      font-size: 0.82rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      margin-bottom: 1.75rem;
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.15);
+      animation: float-gentle 4s ease-in-out infinite;
+    }
+
+    .hero-pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan-42);
+      box-shadow: 0 0 8px var(--cyan-42);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    @keyframes float-gentle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    .hero-title {
+      font-family: var(--font-heading);
+      font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -1.5px;
+      max-width: 980px;
+      margin-bottom: 1.5rem;
+      color: #ffffff;
+    }
+
+    .hero-title .gradient-text {
+      background: linear-gradient(135deg, #ffffff 10%, #00f2fe 50%, #818cf8 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      color: var(--text-secondary);
+      max-width: 780px;
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+      font-weight: 400;
+    }
+
+    .hero-subtitle b {
+      color: var(--text-white);
+      font-weight: 600;
+    }
+
+    .hero-ctas {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--cyan-42), #2563eb);
+      color: #03060f;
+      font-weight: 700;
+      font-size: 0.98rem;
+      padding: 14px 28px;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      box-shadow: 0 0 30px var(--cyan-glow);
+      transition: var(--transition-smooth);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 0 45px rgba(0, 242, 254, 0.6);
+      color: #000;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-surface-elevated);
+      color: var(--text-white);
+      font-weight: 600;
+      font-size: 0.98rem;
+      padding: 14px 26px;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      border: 1px solid var(--border-light);
+      transition: var(--transition-smooth);
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--cyan-42);
+      background: rgba(20, 32, 64, 0.9);
+      transform: translateY(-2px);
+    }
+
+    /* Live Hero Stats Bar */
+    .hero-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+      width: 100%;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .stat-card {
+      background: var(--bg-glass-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 1.4rem 1.2rem;
+      text-align: center;
+      transition: var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan-42), transparent);
+      opacity: 0;
+      transition: var(--transition-smooth);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-cyan);
+      box-shadow: var(--shadow-card), 0 0 25px rgba(0, 242, 254, 0.15);
+    }
+
+    .stat-card:hover::before {
+      opacity: 1;
+    }
+
+    .stat-number {
+      font-family: var(--font-heading);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text-white);
+      letter-spacing: -1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .stat-number .highlight {
+      color: var(--cyan-42);
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    /* ==========================================================================
+       INTERACTIVE TERMINAL (HELLISH / 42CTL SIMULATOR)
+       ========================================================================== */
+    section.terminal-section {
+      padding: 4rem 0;
+      position: relative;
+    }
+
+    .terminal-container {
+      background: #040714;
+      border: 1px solid var(--border-cyan);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 35px rgba(0, 242, 254, 0.15);
+      overflow: hidden;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .terminal-header {
+      background: #080d21;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .terminal-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .dot-close { background: #ff5f56; }
+    .dot-min { background: #ffbd2e; }
+    .dot-max { background: #27c93f; }
+
+    .terminal-title {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .terminal-quick-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .term-btn-badge {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-light);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .term-btn-badge:hover {
+      background: var(--cyan-subtle);
+      color: var(--cyan-42);
+      border-color: var(--border-cyan);
+    }
+
+    .terminal-body {
+      padding: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.92rem;
+      min-height: 380px;
+      max-height: 480px;
+      overflow-y: auto;
+      color: #e2e8f0;
+      line-height: 1.65;
+    }
+
+    .term-output-line {
+      margin-bottom: 6px;
+      word-break: break-word;
+    }
+
+    .term-success { color: var(--emerald-42); }
+    .term-warning { color: var(--amber-42); }
+    .term-error { color: var(--rose-42); }
+    .term-cyan { color: var(--cyan-42); }
+    .term-muted { color: var(--text-muted); }
+    .term-indigo { color: #818cf8; }
+
+    .term-prompt-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .term-prompt {
+      color: var(--cyan-42);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .term-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 0.92rem;
+      width: 100%;
+    }
+
+    /* ==========================================================================
+       SECTION HEADINGS
+       ========================================================================== */
+    .section-header {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 3rem;
+    }
+
+    .section-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--cyan-42);
+      background: var(--cyan-subtle);
+      border: 1px solid var(--border-cyan);
+      padding: 4px 14px;
+      border-radius: 100px;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    .section-title {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 3.5vw, 2.75rem);
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+
+    .section-desc {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      line-height: 1.6;
+    }
+
+    /* ==========================================================================
+       PROJECTS / REPOSITORY CATALOG
+       ========================================================================== */
+    section.projects-section {
+      padding: 5rem 0;
+      position: relative;
+    }
+
+    /* Filter & Search Bar */
+    .catalog-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .search-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 14px 20px 14px 48px;
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      transition: var(--transition-smooth);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--cyan-42);
+      box-shadow: 0 0 20px var(--cyan-glow);
+      background: var(--bg-surface-elevated);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+    }
+
+    .filter-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .filter-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      color: var(--text-secondary);
+      padding: 8px 16px;
+      border-radius: 100px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .filter-btn:hover {
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .filter-btn.active {
+      background: linear-gradient(135deg, var(--cyan-42), #2563eb);
+      color: #03060f;
+      border-color: transparent;
+      box-shadow: 0 0 15px var(--cyan-glow);
+    }
+
+    /* Projects Grid */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .project-card {
+      background: var(--bg-glass-card);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 1.6rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .project-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--border-cyan);
+      box-shadow: var(--shadow-card), 0 0 25px rgba(0, 242, 254, 0.15);
+      background: var(--bg-glass-hover);
+    }
+
+    .project-card-top {
+      margin-bottom: 1.25rem;
+    }
+
+    .card-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.85rem;
+    }
+
+    .lang-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-light);
+    }
+
+    .lang-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+    .lang-c { background: #555555; }
+    .lang-rust { background: #dea584; }
+    .lang-shell { background: #89e051; }
+    .lang-python { background: #3572A5; }
+    .lang-ts { background: #3178c6; }
+    .lang-cpp { background: #f34b7d; }
+    .lang-asm { background: #6E4C13; }
+
+    .card-stars {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: #fbbf24;
+      font-weight: 600;
+    }
+
+    .project-title {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .project-desc {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.55;
+      margin-bottom: 1rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 1.25rem;
+    }
+
+    .tag-pill {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .project-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 1rem;
+    }
+
+    .card-btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--cyan-42);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: var(--transition-smooth);
+    }
+
+    .card-btn-action:hover {
+      color: #fff;
+      transform: translateX(4px);
+    }
+
+    .btn-clone-copy {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-light);
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 5px 9px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-clone-copy:hover {
+      color: #fff;
+      border-color: var(--border-cyan);
+      background: var(--cyan-subtle);
+    }
+
+    /* ==========================================================================
+       SPOTLIGHT HIGHLIGHTS (HELLISH / TORTURETTE / CODEWAR / 42CTL)
+       ========================================================================== */
+    section.spotlights-section {
+      padding: 5rem 0;
+      position: relative;
+    }
+
+    .spotlight-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 2.5rem;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      box-shadow: var(--shadow-card);
+      transition: var(--transition-smooth);
+    }
+
+    .spotlight-card:hover {
+      border-color: var(--border-cyan);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 242, 254, 0.12);
+    }
+
+    .spotlight-card.reverse {
+      grid-template-columns: 1fr 1.1fr;
+    }
+
+    .spotlight-card.reverse .spotlight-info {
+      order: 2;
+    }
+
+    .spotlight-info {
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .spotlight-tag {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--cyan-42);
+      letter-spacing: 1px;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .spotlight-title {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 1rem;
+      letter-spacing: -0.5px;
+    }
+
+    .spotlight-text {
+      color: var(--text-secondary);
+      font-size: 0.98rem;
+      line-height: 1.7;
+      margin-bottom: 1.75rem;
+    }
+
+    .spotlight-features {
+      list-style: none;
+      margin-bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .spotlight-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.92rem;
+      color: #e2e8f0;
+    }
+
+    .spotlight-features svg {
+      width: 18px;
+      height: 18px;
+      color: var(--cyan-42);
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+
+    .spotlight-visual {
+      background: #040713;
+      border-left: 1px solid var(--border-light);
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .spotlight-card.reverse .spotlight-visual {
+      border-left: none;
+      border-right: 1px solid var(--border-light);
+    }
+
+    .code-snippet-box {
+      width: 100%;
+      background: #090e21;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      font-family: var(--font-mono);
+      font-size: 0.84rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .snippet-top {
+      background: #0d1430;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      font-size: 0.74rem;
+    }
+
+    .snippet-content {
+      padding: 16px;
+      line-height: 1.6;
+      color: #cbd5e1;
+      overflow-x: auto;
+    }
+
+    /* ==========================================================================
+       THE 42 CURRICULUM ROADMAP
+       ========================================================================== */
+    section.roadmap-section {
+      padding: 5rem 0;
+      position: relative;
+    }
+
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      position: relative;
+    }
+
+    .roadmap-card {
+      background: var(--bg-glass-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 1.75rem;
+      position: relative;
+      transition: var(--transition-smooth);
+    }
+
+    .roadmap-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--border-cyan);
+      box-shadow: 0 12px 30px rgba(0, 242, 254, 0.12);
+    }
+
+    .roadmap-rank {
+      font-family: var(--font-heading);
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--cyan-42);
+      opacity: 0.25;
+      position: absolute;
+      top: 1.25rem;
+      right: 1.5rem;
+    }
+
+    .roadmap-stage {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--cyan-42);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .roadmap-title {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+
+    .roadmap-tools-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .roadmap-tools-list li {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .roadmap-tools-list li::before {
+      content: '▸';
+      color: var(--cyan-42);
+      font-weight: bold;
+    }
+
+    /* ==========================================================================
+       COMMUNITY & MANIFESTO
+       ========================================================================== */
+    section.manifesto-section {
+      padding: 5rem 0;
+      position: relative;
+    }
+
+    .manifesto-box {
+      background: linear-gradient(135deg, rgba(13, 23, 52, 0.8), rgba(8, 14, 32, 0.9));
+      border: 1px solid var(--border-cyan);
+      border-radius: var(--radius-xl);
+      padding: 3.5rem;
+      text-align: center;
+      box-shadow: 0 0 50px rgba(0, 242, 254, 0.12);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .manifesto-box::before {
+      content: '42';
+      position: absolute;
+      font-family: var(--font-heading);
+      font-size: 18rem;
+      font-weight: 900;
+      color: rgba(0, 242, 254, 0.03);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .manifesto-content {
+      position: relative;
+      z-index: 1;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    .manifesto-quote {
+      font-family: var(--font-heading);
+      font-size: clamp(1.6rem, 3vw, 2.3rem);
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.35;
+      margin-bottom: 1.5rem;
+    }
+
+    .manifesto-desc {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+    }
+
+    /* ==========================================================================
+       FOOTER
+       ========================================================================== */
+    footer.site-footer {
+      border-top: 1px solid var(--border-light);
+      background: #03050c;
+      padding: 4rem 0 2.5rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 2.5rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .footer-brand p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 12px;
+      max-width: 340px;
+      line-height: 1.6;
+    }
+
+    .footer-col-title {
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 1.2rem;
+      letter-spacing: 0.5px;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: var(--transition-smooth);
+    }
+
+    .footer-links a:hover {
+      color: var(--cyan-42);
+      transform: translateX(3px);
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* Toast Notification */
+    .toast-notice {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      background: #0f1b38;
+      border: 1px solid var(--cyan-42);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), 0 0 20px var(--cyan-glow);
+      font-family: var(--font-mono);
+      font-size: 0.84rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: var(--transition-smooth);
+      pointer-events: none;
+    }
+
+    .toast-notice.show {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Responsive Queries */
+    @media (max-width: 1024px) {
+      .hero-stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .spotlight-card, .spotlight-card.reverse { grid-template-columns: 1fr; }
+      .spotlight-visual { border-left: none; border-top: 1px solid var(--border-light); }
+      .roadmap-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .mobile-menu-btn { display: block; }
+      nav.nav-links.mobile-open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 76px;
+        left: 0;
+        right: 0;
+        background: #060a17;
+        border-bottom: 1px solid var(--border-cyan);
+        padding: 1.5rem;
+        gap: 1.25rem;
+      }
+      .hero-stats-grid { grid-template-columns: 1fr; }
+      .roadmap-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .manifesto-box { padding: 2rem 1.5rem; }
+      .manifesto-quote { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Particle Network Canvas -->
+  <canvas id="bg-canvas"></canvas>
+  <div class="scanline-overlay"></div>
+
+  <!-- Toast Notification element -->
+  <div id="toast" class="toast-notice">
+    <span id="toast-icon">🚀</span>
+    <span id="toast-msg">Notification</span>
+  </div>
+
+  <!-- ==========================================================================
+       SITE HEADER
+       ========================================================================== -->
+  <header class="site-header">
+    <div class="container nav-inner">
+      <a href="#" class="brand">
+        <div class="brand-logo">
+          <span>42</span>
+        </div>
+        <div class="brand-text">
+          <div class="brand-name">
+            UNIVERS42 <span class="brand-badge">v2.0</span>
+          </div>
+          <span class="brand-tagline">The Tech Island for 42 Builders</span>
+        </div>
+      </a>
+
+      <nav class="nav-links" id="navMenu">
+        <a href="#about" class="nav-link">Ecosistema</a>
+        <a href="#terminal" class="nav-link">Terminal 42</a>
+        <a href="#projects" class="nav-link">Proyectos (192+)</a>
+        <a href="#spotlights" class="nav-link">Flagships</a>
+        <a href="#curriculum" class="nav-link">Roadmap 42</a>
+        <a href="#manifesto" class="nav-link">Manifiesto</a>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Audio Synth Feedback Toggle -->
+        <button id="audioToggle" class="btn-audio-toggle" title="Alternar Efectos de Sonido HIFI" aria-label="Efectos de Sonido">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </button>
+
+        <!-- Official GitHub Link -->
+        <a href="https://github.com/Univers42" target="_blank" rel="noopener noreferrer" class="btn-github">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          <span>GitHub</span>
+        </a>
+
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir Menú">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       HERO SECTION
+       ========================================================================== */ -->
+  <section class="hero" id="about">
+    <div class="container hero-wrapper">
+      <div class="hero-pill">
+        <span class="hero-pill-dot"></span>
+        <span>OPEN SOURCE ENGINEERING COLLECTIVE // 42 NETWORK</span>
+      </div>
+
+      <h1 class="hero-title">
+        The tools are the projects.<br>
+        <span class="gradient-text">The projects are the tools.</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        <b>Univers42</b> es la isla tecnológica forjada por estudiantes y creadores de <b>Escuela 42</b>. 
+        Desarrollamos shells POSIX con TDD, sanitizadores de memoria antes de evaluación, simuladores de exámenes a contrarreloj, 
+        infraestructura segura y motores gráficos en Rust compilados a WebAssembly.
+      </p>
+
+      <div class="hero-ctas">
+        <a href="#projects" class="btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          <span>Explorar 192+ Repositorios</span>
+        </a>
+        <a href="#terminal" class="btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+          <span>Abrir Terminal 42</span>
+        </a>
+      </div>
+
+      <!-- Hero Statistics -->
+      <div class="hero-stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">
+            <span class="highlight">192</span>+
+          </div>
+          <div class="stat-label">Repositorios Públicos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">
+            <span class="highlight">100</span>%
+          </div>
+          <div class="stat-label">Peer-to-Peer & FOSS</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">
+            <span class="highlight">0</span>
+          </div>
+          <div class="stat-label">Memory Leaks Tolerados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">
+            <span class="highlight">R00</span>→<span class="highlight">R06</span>
+          </div>
+          <div class="stat-label">Cobertura de Cursus</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       INTERACTIVE TERMINAL (HELLISH / 42CTL SIMULATOR)
+       ========================================================================== -->
+  <section class="terminal-section" id="terminal">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">CLI EXPERIENCE</span>
+        <h2 class="section-title">Terminal Interactivo Univers42</h2>
+        <p class="section-desc">
+          Prueba comandos reales, ejecuta un test de francinette simulado, verifica memory leaks con Torturette o simula un examen de 42 directamente en tu navegador.
+        </p>
+      </div>
+
+      <div class="terminal-container">
+        <div class="terminal-header">
+          <div class="terminal-controls">
+            <span class="terminal-dot dot-close"></span>
+            <span class="terminal-dot dot-min"></span>
+            <span class="terminal-dot dot-max"></span>
+          </div>
+          <div class="terminal-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+            <span>univers42@cluster-madrid: ~/workspace (hellish-sh v1.4.2)</span>
+          </div>
+          <div class="terminal-quick-actions">
+            <button class="term-btn-badge" onclick="runTermCommand('francinette')">francinette</button>
+            <button class="term-btn-badge" onclick="runTermCommand('torturette')">torturette</button>
+            <button class="term-btn-badge" onclick="runTermCommand('exam')">exam</button>
+            <button class="term-btn-badge" onclick="runTermCommand('help')">help</button>
+          </div>
+        </div>
+
+        <div class="terminal-body" id="termOutput">
+          <div class="term-output-line term-cyan">
+            ╔═════════════════════════════════════════════════════════════════════════╗
+          </div>
+          <div class="term-output-line term-cyan">
+            ║  WELCOME TO UNIVERS42 INTERACTIVE SHELL [HELLISH POSIX ENGINE]          ║
+          </div>
+          <div class="term-output-line term-cyan">
+            ║  "A tech island for 42 builders. The tools are the projects."           ║
+          </div>
+          <div class="term-output-line term-cyan">
+            ╚═════════════════════════════════════════════════════════════════════════╝
+          </div>
+          <div class="term-output-line term-muted">
+            Escribe <span class="term-cyan">help</span> para ver comandos disponibles o haz clic en los accesos rápidos de arriba.
+          </div>
+          <div class="term-output-line term-indigo">
+            Tips: prueba 'francinette', 'torturette', 'repos', 'codewar', 'manifesto' o 'clear'.
+          </div>
+        </div>
+
+        <div class="term-prompt-line" style="padding: 0 20px 20px;">
+          <span class="term-prompt">cadet@univers42:~$</span>
+          <input type="text" id="termInput" class="term-input" placeholder="escribe un comando..." autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       FLAGSHIPS & SPOTLIGHTS
+       ========================================================================== -->
+  <section class="spotlights-section" id="spotlights">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">ENGINEERING SPOTLIGHTS</span>
+        <h2 class="section-title">Herramientas Forjadas en la Trinchera</h2>
+        <p class="section-desc">
+          En 42 no usamos librerías de alto nivel para resolver el problema: construimos las bases desde cero con C, Rust y arquitectura rigurosa.
+        </p>
+      </div>
+
+      <!-- Spotlight 1: hellish -->
+      <div class="spotlight-card">
+        <div class="spotlight-info">
+          <div class="spotlight-tag">
+            <span>POSIX SHELL & TDD</span> • ★ 54 STARS
+          </div>
+          <h3 class="spotlight-title">hellish</h3>
+          <p class="spotlight-text">
+            Nacido tras las batallas de Minishell y 42sh. En vez de un parser improvisado con fallos en pipes, 
+            <i>hellish</i> fue concebido bajo metodología estricta de Test-Driven Development (TDD) y técnicas DevOps. 
+            Manejo POSIX impecable, pipelines, redirecciones compuestas, variables de entorno y cero fugas de descriptores.
+          </p>
+          <ul class="spotlight-features">
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Parser determinista con AST completo y compatibilidad POSIX.</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Pipelines bidireccionales y gestión de señales robusta (SIGINT, SIGQUIT).</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Batería de pruebas automatizadas con integración continua.</span>
+            </li>
+          </ul>
+          <div>
+            <a href="https://github.com/Univers42/hellish" target="_blank" rel="noopener noreferrer" class="btn-primary">
+              <span>Ver Repo hellish</span> ↗
+            </a>
+          </div>
+        </div>
+        <div class="spotlight-visual">
+          <div class="code-snippet-box">
+            <div class="snippet-top">
+              <span>src/parser/ast_exec.c</span>
+              <span>Language: C</span>
+            </div>
+            <div class="snippet-content">
+<pre><code><span style="color:#60a5fa">t_ast_node</span> *parse_pipeline(<span style="color:#60a5fa">t_lexer</span> *lex) {
+    <span style="color:#60a5fa">t_ast_node</span> *node = parse_command(lex);
+    <span style="color:#f472b6">while</span> (match_token(lex, TOKEN_PIPE)) {
+        <span style="color:#60a5fa">t_ast_node</span> *pipe_node = ast_node_new(NODE_PIPE);
+        pipe_node->left = node;
+        pipe_node->right = parse_command(lex);
+        node = pipe_node;
+    }
+    <span style="color:#4ade80">/* 0 leaks, FD tracking active */</span>
+    <span style="color:#f472b6">return</span> (node);
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spotlight 2: Torturette -->
+      <div class="spotlight-card reverse">
+        <div class="spotlight-info">
+          <div class="spotlight-tag">
+            <span>MEMCHECK & SANITIZER</span> • ★ 22 STARS
+          </div>
+          <h3 class="spotlight-title">Torturette</h3>
+          <p class="spotlight-text">
+            El salvavidas antes de la evaluación entre pares (Peer-Correction). 
+            Intercepta y monitoriza cada llamada a <code>malloc</code>, <code>free</code> y <code>realloc</code> en tiempo de ejecución. 
+            Te alerta de double-frees, punteros colgantes y bytes huérfanos antes de que Moulinette te mande un 0.
+          </p>
+          <ul class="spotlight-features">
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Rastreo dinámico de heap en C sin sobrecarga ni librerías externas.</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Reporte detallado con número de allocations, frees y balances.</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Fácilmente integrable con <code>make test</code> en cualquier proyecto.</span>
+            </li>
+          </ul>
+          <div>
+            <a href="https://github.com/Univers42/Torturette" target="_blank" rel="noopener noreferrer" class="btn-primary">
+              <span>Ver Repo Torturette</span> ↗
+            </a>
+          </div>
+        </div>
+        <div class="spotlight-visual">
+          <div class="code-snippet-box">
+            <div class="snippet-top">
+              <span>torturette_report.log</span>
+              <span>Sanitizer Output</span>
+            </div>
+            <div class="snippet-content">
+<pre><code><span style="color:#38bdf8">[TORTURETTE HEAP TRACER v2.0]</span>
+>> Intercepting memory blocks...
+---------------------------------------------
+TOTAL ALLOCS:  <span style="color:#facc15">14,280 calls</span>
+TOTAL FREES:   <span style="color:#4ade80">14,280 calls</span>
+BYTES LEAKED:  <span style="color:#4ade80">0 bytes (Clean!)</span>
+DOUBLE FREES:  <span style="color:#4ade80">0 detected</span>
+---------------------------------------------
+<span style="color:#4ade80">STATUS: PASSED 100/100 (Moulinette Ready!)</span></code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spotlight 3: 42ctl & vault42 -->
+      <div class="spotlight-card">
+        <div class="spotlight-info">
+          <div class="spotlight-tag">
+            <span>RUST PLATFORM & SECURITY</span> • CYBERSECURITY
+          </div>
+          <h3 class="spotlight-title">42ctl & vault42</h3>
+          <p class="spotlight-text">
+            CLI paraguas de distribución multicanal y sistema de ciberdefensa en Rust. 
+            Permite gestión de secretos zero-knowledge, autenticación distribuida, enrutamiento a través de nodos Tor 
+            (con <i>invisibility-cloak</i>) y orquestación integral de la infraestructura del colectivo.
+          </p>
+          <ul class="spotlight-features">
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Cero conocimiento: los secretos nunca tocan memoria sin cifrado AES-256-GCM.</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Distribución firmada con Homebrew Tap (`homebrew-tap/42ctl`).</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Construido íntegramente con Rust y seguridad en concurrencia sin data races.</span>
+            </li>
+          </ul>
+          <div>
+            <a href="https://github.com/Univers42/42ctl" target="_blank" rel="noopener noreferrer" class="btn-primary">
+              <span>Explorar 42ctl</span> ↗
+            </a>
+          </div>
+        </div>
+        <div class="spotlight-visual">
+          <div class="code-snippet-box">
+            <div class="snippet-top">
+              <span>src/crypto/vault.rs</span>
+              <span>Language: Rust</span>
+            </div>
+            <div class="snippet-content">
+<pre><code><span style="color:#f472b6">pub struct</span> <span style="color:#60a5fa">ZeroKnowledgeVault</span> {
+    cipher: Aes256Gcm,
+    nonce_gen: OsRng,
+}
+
+<span style="color:#f472b6">impl</span> <span style="color:#60a5fa">ZeroKnowledgeVault</span> {
+    <span style="color:#f472b6">pub fn</span> encrypt_secret(&amp;<span style="color:#f472b6">mut self</span>, payload: &amp;[<span style="color:#60a5fa">u8</span>]) 
+        -&gt; Result&lt;<span style="color:#60a5fa">Vec</span>&lt;<span style="color:#60a5fa">u8</span>&gt;, VaultError&gt; {
+        <span style="color:#4ade80">// Zero-knowledge state seal</span>
+        <span style="color:#f472b6">self</span>.cipher.encrypt_in_place(payload)
+    }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       REPOSITORY CATALOG & REAL-TIME FILTER
+       ========================================================================== -->
+  <section class="projects-section" id="projects">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">PROYECTOS & LIBRERÍAS</span>
+        <h2 class="section-title">Catálogo de Proyectos Univers42</h2>
+        <p class="section-desc">
+          Explora los proyectos clave forjados por el colectivo. Filtra por categoría o busca cualquier proyecto, herramienta o módulo.
+        </p>
+      </div>
+
+      <!-- Search & Filters -->
+      <div class="catalog-bar">
+        <div class="search-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="projectSearch" class="search-input" placeholder="Buscar por nombre, descripción o tecnología (p. ej: shell, rust, exam, malloc, ray-tracing)...">
+        </div>
+
+        <div class="filter-tabs" id="filterTabs">
+          <button class="filter-btn active" data-filter="all">Todos los Proyectos</button>
+          <button class="filter-btn" data-filter="systems">Sistemas & C</button>
+          <button class="filter-btn" data-filter="testers">Testers & Exámenes</button>
+          <button class="filter-btn" data-filter="rust">Rust & Motores</button>
+          <button class="filter-btn" data-filter="security">Seguridad & Redes</button>
+          <button class="filter-btn" data-filter="ai">IA & Agentic Tooling</button>
+        </div>
+      </div>
+
+      <!-- Grid of Cards -->
+      <div class="projects-grid" id="projectsGrid">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       THE 42 CURRICULUM ROADMAP
+       ========================================================================== -->
+  <section class="roadmap-section" id="curriculum">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">EL CAMINO DE 42</span>
+        <h2 class="section-title">La Cobertura del Cursus de Escuela 42</h2>
+        <p class="section-desc">
+          Desde el primer día de la Piscine hasta los proyectos avanzados de ciberseguridad y gráficos, Univers42 provee armamento de ingeniería para cada rango.
+        </p>
+      </div>
+
+      <div class="roadmap-grid">
+        <!-- Stage 1 -->
+        <div class="roadmap-card">
+          <div class="roadmap-rank">R00</div>
+          <div class="roadmap-stage">Piscine & Fundamentos</div>
+          <h3 class="roadmap-title">Supervivencia & C Puro</h3>
+          <ul class="roadmap-tools-list">
+            <li><strong>francinette-installer:</strong> Setup automatizado de pruebas.</li>
+            <li><strong>libft:</strong> Reimplementación de la librería libc.</li>
+            <li><strong>Pool42:</strong> Baterías de ejercicios de C y Shell.</li>
+            <li><strong>Testor:</strong> Verificación de argumentos y edge-cases.</li>
+          </ul>
+        </div>
+
+        <!-- Stage 2 -->
+        <div class="roadmap-card">
+          <div class="roadmap-rank">R02</div>
+          <div class="roadmap-stage">Rank 01 - 02</div>
+          <h3 class="roadmap-title">I/O & Algoritmia</h3>
+          <ul class="roadmap-tools-list">
+            <li><strong>GetNextLine & gnlTester:</strong> Lectura bufferizada sin memory leaks.</li>
+            <li><strong>ft_printf_tester:</strong> Parsing variádico y formateo riguroso.</li>
+            <li><strong>Born2BeRoot & born2root:</strong> Orquestador de máquinas virtuales LVM.</li>
+            <li><strong>push_swap & ps_tester:</strong> Optimización de ordenamiento de dos stacks.</li>
+          </ul>
+        </div>
+
+        <!-- Stage 3 -->
+        <div class="roadmap-card">
+          <div class="roadmap-rank">R04</div>
+          <div class="roadmap-stage">Rank 03 - 04</div>
+          <h3 class="roadmap-title">Sistemas & Concurrencia</h3>
+          <ul class="roadmap-tools-list">
+            <li><strong>hellish:</strong> Alternativa POSIX profesional a minishell.</li>
+            <li><strong>philosophers:</strong> Hilos, mutexes y sincronización POSIX.</li>
+            <li><strong>Torturette:</strong> Monitoreo de allocations antes de peer-eval.</li>
+            <li><strong>ray-tracing (miniRT):</strong> Motor de renderizado en C.</li>
+          </ul>
+        </div>
+
+        <!-- Stage 4 -->
+        <div class="roadmap-card">
+          <div class="roadmap-rank">R06+</div>
+          <div class="roadmap-stage">Rank 05 - Outer Core</div>
+          <h3 class="roadmap-title">Rust, Redes & IA</h3>
+          <ul class="roadmap-tools-list">
+            <li><strong>42ctl & vault42:</strong> Seguridad defensiva y zero-knowledge.</li>
+            <li><strong>graph_render:</strong> Renderizador WebAssembly & WebGL2.</li>
+            <li><strong>invisibility-cloak:</strong> Enrutamiento forzado con Tor exits.</li>
+            <li><strong>claude-deal-with-the-devil:</strong> Agentic engineering & skills.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       MANIFESTO
+       ========================================================================== -->
+  <section class="manifesto-section" id="manifesto">
+    <div class="container">
+      <div class="manifesto-box">
+        <div class="manifesto-content">
+          <span class="section-tag" style="background: rgba(0,242,254,0.15); border-color: var(--cyan-42);">EL MANIFIESTO UNIVERS42</span>
+          <h2 class="manifesto-quote">
+            "No usamos muletas. No nos conformamos con aprobar. Creamos las herramientas con las que otros aprenden a construir."
+          </h2>
+          <p class="manifesto-desc">
+            En un mundo repleto de dependencias de 500 MB y capas infinitas de abstracción, los builders de Escuela 42 
+            mantenemos el fuego sagrado del low-level: punteros en C, concurrencia en Rust, llamadas al kernel de Linux, 
+            y una pasión obsesiva por el código bien diseñado, modular y testado contra cualquier sorpresa de la vida real.
+          </p>
+          <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+            <a href="https://github.com/Univers42" target="_blank" rel="noopener noreferrer" class="btn-primary">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+              </svg>
+              <span>Únete al Colectivo en GitHub</span>
+            </a>
+            <button onclick="runTermCommand('manifesto'); document.getElementById('terminal').scrollIntoView({behavior: 'smooth'});" class="btn-secondary">
+              <span>Leer en Terminal</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       FOOTER
+       ========================================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="brand">
+            <div class="brand-logo">
+              <span>42</span>
+            </div>
+            <div class="brand-text">
+              <div class="brand-name">UNIVERS42</div>
+              <span class="brand-tagline">The Tech Island for 42 Builders</span>
+            </div>
+          </div>
+          <p>
+            Laboratorio abierto e independiente de ingeniería de sistemas creado por la comunidad de Escuela 42. 
+            Todas las herramientas son libres, peer-reviewed y construidas para el aprendizaje mutuo.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Proyectos Destacados</h4>
+          <ul class="footer-links">
+            <li><a href="https://github.com/Univers42/hellish" target="_blank">hellish (POSIX Shell)</a></li>
+            <li><a href="https://github.com/Univers42/Torturette" target="_blank">Torturette (Heap Tracer)</a></li>
+            <li><a href="https://github.com/Univers42/codewar" target="_blank">codewar (Assessment Simulator)</a></li>
+            <li><a href="https://github.com/Univers42/42ctl" target="_blank">42ctl & vault42</a></li>
+            <li><a href="https://github.com/Univers42/graph_render" target="_blank">graph_render (Rust & WASM)</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">42 Testers & Utils</h4>
+          <ul class="footer-links">
+            <li><a href="https://github.com/Univers42/francinette-installer" target="_blank">francinette-installer</a></li>
+            <li><a href="https://github.com/Univers42/Examen42" target="_blank">Examen42</a></li>
+            <li><a href="https://github.com/Univers42/born2root" target="_blank">born2root (Hypervisor)</a></li>
+            <li><a href="https://github.com/Univers42/invisibility-cloak" target="_blank">invisibility-cloak (Tor)</a></li>
+            <li><a href="https://github.com/Univers42/xft" target="_blank">xft (Extended Libft)</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Comunidad & Contacto</h4>
+          <ul class="footer-links">
+            <li><a href="https://github.com/Univers42" target="_blank">Organización GitHub</a></li>
+            <li><a href="mailto:dev.pro.photo@gmail.com">dev.pro.photo@gmail.com</a></li>
+            <li><a href="https://github.com/Univers42/homebrew-tap" target="_blank">Homebrew Tap</a></li>
+            <li><a href="https://github.com/Univers42/claude-deal-with-the-devil" target="_blank">Agentic Skills</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          © 2025–2026 <strong>UNIVERS42</strong>. Código abierto bajo licencias MIT / GPL / Unlicense.
+        </div>
+        <div>
+          <span>Hecho con 🖤 por 42 Cadets. No afiliado oficialmente a 42 Network.</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       CORE JAVASCRIPT LOGIC
+       ========================================================================== -->
+  <script>
+    /* ==========================================================================
+       1. DATA CATALOG OF UNIVERS42 KEY REPOSITORIES
+       ========================================================================== */
+    const UNIVERS42_PROJECTS = [
+      {
+        name: "hellish",
+        stars: 54,
+        category: "systems",
+        lang: "C",
+        langClass: "lang-c",
+        tags: ["POSIX", "Shell", "TDD", "DevOps", "AST"],
+        desc: "POSIX shell nacido de los retos de minishell y 42sh. Desarrollado con riguroso TDD, parser determinista de comandos, pipelines y gestión de procesos.",
+        url: "https://github.com/Univers42/hellish"
+      },
+      {
+        name: "francinette-installer",
+        stars: 52,
+        category: "testers",
+        lang: "Shell",
+        langClass: "lang-shell",
+        tags: ["Installer", "Tester", "Automation", "42 Core"],
+        desc: "Instalador en un solo comando para la suite Francinette, el framework de testing imprescindible para validar proyectos del cursus de 42.",
+        url: "https://github.com/Univers42/francinette-installer"
+      },
+      {
+        name: "Torturette",
+        stars: 22,
+        category: "systems",
+        lang: "C",
+        langClass: "lang-c",
+        tags: ["Sanitizer", "Memory Leak", "Valgrind", "Debug"],
+        desc: "Herramienta de depuración para rastrear la asignación dinámica (malloc/free) de tus programas antes de la evaluación. ¡Evita ceros inesperados!",
+        url: "https://github.com/Univers42/Torturette"
+      },
+      {
+        name: "codewar",
+        stars: 8,
+        category: "testers",
+        lang: "Python",
+        langClass: "lang-python",
+        tags: ["Exam Simulator", "Grading", "Timer", "Rank 02-04"],
+        desc: "Simulador de terminal para evaluaciones técnicas: modos práctica y examen real, ejercicios con enunciados, corrección con diffs y cuenta atrás de 3 horas.",
+        url: "https://github.com/Univers42/codewar"
+      },
+      {
+        name: "Examen42",
+        stars: 8,
+        category: "testers",
+        lang: "C",
+        langClass: "lang-c",
+        tags: ["Exam", "Simulación", "42 Cursus", "Moulinette"],
+        desc: "Suite de preparación y ejercicios de examen para superar los exámenes oficiales de Escuela 42.",
+        url: "https://github.com/Univers42/Examen42"
+      },
+      {
+        name: "vault42",
+        stars: 4,
+        category: "security",
+        lang: "Rust",
+        langClass: "lang-rust",
+        tags: ["Cybersecurity", "Zero-Knowledge", "Crypto", "Defense"],
+        desc: "Proyecto de ciberseguridad defensiva en Rust para aprender criptografía aplicada y proteger secretos diarios con cifrado zero-knowledge.",
+        url: "https://github.com/Univers42/vault42"
+      },
+      {
+        name: "42ctl",
+        stars: 2,
+        category: "rust",
+        lang: "Rust",
+        langClass: "lang-rust",
+        tags: ["CLI Platform", "Homebrew", "Auth", "Query"],
+        desc: "El paraguas CLI para la suite 42 (grobase + vault42): secretos zero-knowledge, auth y distribución multi-canal firmada.",
+        url: "https://github.com/Univers42/42ctl"
+      },
+      {
+        name: "born2root",
+        stars: 4,
+        category: "systems",
+        lang: "Shell",
+        langClass: "lang-shell",
+        tags: ["Hypervisor", "QEMU", "VirtualBox", "Born2beRoot"],
+        desc: "Orquestador de máquinas virtuales tipo I y tipo II con QEMU/VirtualBox para simplificar el despliegue del proyecto Born2beroot.",
+        url: "https://github.com/Univers42/born2root"
+      },
+      {
+        name: "claude-deal-with-the-devil",
+        stars: 4,
+        category: "ai",
+        lang: "Shell",
+        langClass: "lang-shell",
+        tags: ["Agentic AI", "Token Saving", "Hooks", "Skills"],
+        desc: "Configuración y mejores prácticas de ingeniería para Claude Code: skills, hooks, rules y scripts para reducir dramáticamente el consumo de tokens.",
+        url: "https://github.com/Univers42/claude-deal-with-the-devil"
+      },
+      {
+        name: "graph_render",
+        stars: 1,
+        category: "rust",
+        lang: "Rust",
+        langClass: "lang-rust",
+        tags: ["WASM", "WebGL2", "Graph Engine", "TypeScript"],
+        desc: "Motor determinista de layout de grafos y diagramas en Rust compilado a WebAssembly (DAG, árboles, fuerza dirigida) con visor WebGL2 para grandes redes.",
+        url: "https://github.com/Univers42/graph_render"
+      },
+      {
+        name: "invisibility-cloak",
+        stars: 1,
+        category: "security",
+        lang: "Shell",
+        langClass: "lang-shell",
+        tags: ["Tor", "Privacy", "Fail-Closed", "Routing"],
+        desc: "Oculta tu IP en cualquier sistema Linux: redirige el tráfico de aplicaciones, usuarios y contenedores a través de nodos Tor rotativos con fail-closed.",
+        url: "https://github.com/Univers42/invisibility-cloak"
+      },
+      {
+        name: "ray-tracing",
+        stars: 0,
+        category: "systems",
+        lang: "C",
+        langClass: "lang-c",
+        tags: ["Ray Tracing", "miniRT", "Render Engine", "Math"],
+        desc: "Motor de renderizado de Ray Tracing en C puro (miniRT): simulación geométrica de esferas, cilindros, luces especulares y sombras difusas.",
+        url: "https://github.com/Univers42/ray-tracing"
+      },
+      {
+        name: "ft_irc",
+        stars: 0,
+        category: "systems",
+        lang: "C++",
+        langClass: "lang-cpp",
+        tags: ["IRC RFC", "Sockets", "Non-blocking", "Multiplayer"],
+        desc: "Servidor de mensajería en tiempo real basado en el protocolo IRC (Internet Relay Chat) con arquitectura orientada a eventos multiplexada con poll/epoll.",
+        url: "https://github.com/Univers42/ft_irc"
+      },
+      {
+        name: "draw-engine",
+        stars: 0,
+        category: "rust",
+        lang: "Rust",
+        langClass: "lang-rust",
+        tags: ["Graphics", "Excalidraw", "Canvas", "Engine"],
+        desc: "Motor de renderizado de dibujo vectorial estilo Excalidraw implementado en Rust para máxima velocidad de renderizado en el navegador.",
+        url: "https://github.com/Univers42/draw-engine"
+      },
+      {
+        name: "vtracer",
+        stars: 1,
+        category: "rust",
+        lang: "Rust",
+        langClass: "lang-rust",
+        tags: ["Raster to Vector", "SVG", "Vision", "CLI"],
+        desc: "Convertidor de gráficos rasterizados (PNG/JPEG) a vectores SVG escalables escrito en Rust.",
+        url: "https://github.com/Univers42/vtracer"
+      },
+      {
+        name: "xft",
+        stars: 0,
+        category: "systems",
+        lang: "C",
+        langClass: "lang-c",
+        tags: ["Extended Libft", "42 Compliant", "Data Structures"],
+        desc: "Librería extendida en C 100% conforme a la Norminette de 42, con listas enlazadas, hashes, colas y funciones matemáticas avanzadas.",
+        url: "https://github.com/Univers42/xft"
+      },
+      {
+        name: "catch_error",
+        stars: 0,
+        category: "systems",
+        lang: "C",
+        langClass: "lang-c",
+        tags: ["Error Handling", "Zero-Overhead", "Modularity"],
+        desc: "Framework ligero para capturar y propagar errores en C eficientemente sin saturar la CPU con sentencias repetitivas.",
+        url: "https://github.com/Univers42/catch_error"
+      },
+      {
+        name: "C_exception",
+        stars: 0,
+        category: "systems",
+        lang: "C",
+        langClass: "lang-c",
+        tags: ["Try/Catch", "Exception Handling", "Setjmp", "Low Level"],
+        desc: "Implementación de manejo de excepciones estilo Java (try, catch, throw, finally) en C puro mediante setjmp/longjmp.",
+        url: "https://github.com/Univers42/C_exception"
+      },
+      {
+        name: "chrome-devtools-mcp",
+        stars: 0,
+        category: "ai",
+        lang: "TypeScript",
+        langClass: "lang-ts",
+        tags: ["MCP Server", "Coding Agents", "DevTools", "AI"],
+        desc: "Servidor MCP (Model Context Protocol) para conectar agentes de inteligencia artificial directamente con las Chrome DevTools.",
+        url: "https://github.com/Univers42/chrome-devtools-mcp"
+      },
+      {
+        name: "Inception",
+        stars: 0,
+        category: "security",
+        lang: "Shell",
+        langClass: "lang-shell",
+        tags: ["Docker", "Docker Compose", "Nginx", "WordPress", "MariaDB"],
+        desc: "Infraestructura multi-servicio contenedorizada sobre máquinas virtuales Linux cumpliendo las reglas estrictas de 42 Inception.",
+        url: "https://github.com/Univers42/Inception"
+      },
+      {
+        name: "dr-quine",
+        stars: 0,
+        category: "systems",
+        lang: "Assembly",
+        langClass: "lang-asm",
+        tags: ["Assembly x86_64", "Quines", "Self-Replication"],
+        desc: "Programas autorreplicantes (Colleen, Grace, Sully) en Ensamblador NASM x86_64 y C puro.",
+        url: "https://github.com/Univers42/dr-quine"
+      }
+    ];
+
+    /* ==========================================================================
+       2. WEB AUDIO API SYNTHESIZER (HIFI AUDIO CLICKS)
+       ========================================================================== */
+    let audioContext = null;
+    let audioEnabled = false;
+
+    function initAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playKeyClick(type = 'click') {
+      if (!audioEnabled || !audioContext) return;
+      try {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+
+        const now = audioContext.currentTime;
+
+        if (type === 'click') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(180, now + 0.04);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+          osc.start(now);
+          osc.stop(now + 0.04);
+        } else if (type === 'beep') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, now);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+          osc.start(now);
+          osc.stop(now + 0.12);
+        } else if (type === 'success') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.setValueAtTime(659.25, now + 0.06); // E5
+          osc.frequency.setValueAtTime(783.99, now + 0.12); // G5
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        }
+      } catch (e) {
+        console.warn("Audio error:", e);
+      }
+    }
+
+    const audioToggleBtn = document.getElementById('audioToggle');
+    audioToggleBtn.addEventListener('click', () => {
+      initAudio();
+      audioEnabled = !audioEnabled;
+      if (audioEnabled) {
+        if (audioContext.state === 'suspended') audioContext.resume();
+        audioToggleBtn.classList.add('active');
+        showToast("Audio Activado: Efectos Mecánicos & Terminal ON", "🔊");
+        playKeyClick('success');
+      } else {
+        audioToggleBtn.classList.remove('active');
+        showToast("Audio Desactivado", "🔇");
+      }
+    });
+
+    /* ==========================================================================
+       3. TOAST NOTIFICATIONS
+       ========================================================================== */
+    function showToast(message, icon = "🚀") {
+      const toast = document.getElementById('toast');
+      const msgSpan = document.getElementById('toast-msg');
+      const iconSpan = document.getElementById('toast-icon');
+
+      msgSpan.textContent = message;
+      iconSpan.textContent = icon;
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+
+    /* ==========================================================================
+       4. INTERACTIVE BACKGROUND CANVAS (42 CYBER CONSTELLATION)
+       ========================================================================== */
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let particles = [];
+    const PARTICLE_COUNT = 55;
+    let mouse = { x: -1000, y: -1000 };
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 0.45;
+        this.vy = (Math.random() - 0.5) * 0.45;
+        this.radius = Math.random() * 2 + 1;
+        this.color = Math.random() > 0.5 ? '#00f2fe' : '#6366f1';
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < 0 || this.x > width) this.vx *= -1;
+        if (this.y < 0 || this.y > height) this.vy *= -1;
+
+        // Mouse repulse
+        const dx = mouse.x - this.x;
+        const dy = mouse.y - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          this.x -= (dx / dist) * 1.5;
+          this.y -= (dy / dist) * 1.5;
+        }
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = this.color;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push(new Particle());
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, width, height);
+
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 130) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(0, 242, 254, ${0.16 * (1 - dist / 130)})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    /* ==========================================================================
+       5. PROJECT CATALOG RENDERING & FILTERING
+       ========================================================================== */
+    const projectsGrid = document.getElementById('projectsGrid');
+    const projectSearch = document.getElementById('projectSearch');
+    const filterTabs = document.getElementById('filterTabs');
+    let currentCategory = 'all';
+
+    function renderProjects() {
+      const query = projectSearch.value.trim().toLowerCase();
+
+      const filtered = UNIVERS42_PROJECTS.filter(project => {
+        const matchesCategory = (currentCategory === 'all' || project.category === currentCategory);
+        const matchesQuery = !query || 
+          project.name.toLowerCase().includes(query) ||
+          project.desc.toLowerCase().includes(query) ||
+          project.tags.some(t => t.toLowerCase().includes(query)) ||
+          project.lang.toLowerCase().includes(query);
+
+        return matchesCategory && matchesQuery;
+      });
+
+      if (filtered.length === 0) {
+        projectsGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; background: var(--bg-surface); border-radius: 16px; border: 1px dashed var(--border-light);">
+            <p style="color: var(--cyan-42); font-family: var(--font-mono); font-size: 1.1rem; margin-bottom: 8px;">[404: REPO NOT FOUND IN CURRENT FILTER]</p>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">No se encontraron proyectos con el término "${query}". Intenta buscar "shell", "c", "rust", "tester" o restablece los filtros.</p>
+          </div>
+        `;
+        return;
+      }
+
+      projectsGrid.innerHTML = filtered.map(p => `
+        <div class="project-card">
+          <div class="project-card-top">
+            <div class="card-meta-row">
+              <span class="lang-badge">
+                <span class="lang-dot ${p.langClass}"></span>
+                ${p.lang}
+              </span>
+              <span class="card-stars">
+                ★ ${p.stars}
+              </span>
+            </div>
+
+            <h3 class="project-title">
+              <span>${p.name}</span>
+            </h3>
+
+            <p class="project-desc">${p.desc}</p>
+
+            <div class="project-tags">
+              ${p.tags.map(t => `<span class="tag-pill">#${t}</span>`).join('')}
+            </div>
+          </div>
+
+          <div class="project-card-footer">
+            <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="card-btn-action">
+              <span>Ver en GitHub</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+
+            <button class="btn-clone-copy" onclick="copyClone('${p.url}', '${p.name}')" title="Copiar git clone">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>clone</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Filter Buttons Click
+    filterTabs.addEventListener('click', (e) => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      playKeyClick('click');
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCategory = btn.dataset.filter;
+      renderProjects();
+    });
+
+    // Search Input Event
+    projectSearch.addEventListener('input', () => {
+      renderProjects();
+    });
+
+    // Copy Git Clone
+    window.copyClone = function(url, name) {
+      playKeyClick('click');
+      const cloneCmd = `git clone ${url}.git`;
+      navigator.clipboard.writeText(cloneCmd).then(() => {
+        showToast(`Copiado: ${cloneCmd}`, "📋");
+      }).catch(() => {
+        showToast(`Clona con: ${cloneCmd}`, "📋");
+      });
+    };
+
+    // Initial render
+    renderProjects();
+
+    /* ==========================================================================
+       6. INTERACTIVE TERMINAL LOGIC & COMMAND EMULATOR
+       ========================================================================== */
+    const termInput = document.getElementById('termInput');
+    const termOutput = document.getElementById('termOutput');
+
+    function appendTermLine(content, className = '') {
+      const line = document.createElement('div');
+      line.className = `term-output-line ${className}`;
+      line.innerHTML = content;
+      termOutput.appendChild(line);
+      termOutput.scrollTop = termOutput.scrollHeight;
+    }
+
+    window.runTermCommand = function(cmd) {
+      playKeyClick('click');
+      termInput.value = cmd;
+      executeCommand(cmd);
+      termInput.value = '';
+      termInput.focus();
+    };
+
+    function executeCommand(raw) {
+      const command = raw.trim().toLowerCase();
+      if (!command) return;
+
+      appendTermLine(`<span class="term-cyan">cadet@univers42:~$</span> ${escapeHtml(raw)}`);
+
+      switch (command) {
+        case 'help':
+          appendTermLine(`Comandos disponibles:`, 'term-cyan');
+          appendTermLine(`  <span class="term-indigo">repos</span>         - Lista los proyectos con mayor número de estrellas`);
+          appendTermLine(`  <span class="term-indigo">francinette</span>   - Ejecuta una simulación completa del tester de 42`);
+          appendTermLine(`  <span class="term-indigo">torturette</span>    - Rastrear allocations y memoria en busca de leaks`);
+          appendTermLine(`  <span class="term-indigo">exam</span>          - Ejecuta una pregunta de prueba del simulador de examen`);
+          appendTermLine(`  <span class="term-indigo">manifesto</span>     - Muestra el credo del builder de Univers42`);
+          appendTermLine(`  <span class="term-indigo">norminette</span>    - Comprueba el estilo de código contra la Norme 42`);
+          appendTermLine(`  <span class="term-indigo">42</span>            - The Answer to the Ultimate Question of Life`);
+          appendTermLine(`  <span class="term-indigo">about</span>         - Sobre el colectivo Univers42`);
+          appendTermLine(`  <span class="term-indigo">clear</span>         - Limpia la pantalla`);
+          break;
+
+        case 'clear':
+          termOutput.innerHTML = '';
+          break;
+
+        case 'repos':
+          appendTermLine(`[TOP UNIVERS42 REPOSITORIES]`, 'term-cyan');
+          UNIVERS42_PROJECTS.slice(0, 7).forEach(p => {
+            appendTermLine(`• <a href="${p.url}" target="_blank" style="color: #38bdf8; text-decoration: underline;">${p.name}</a> (${p.lang}) ★${p.stars} - ${p.tags.join(', ')}`);
+          });
+          break;
+
+        case 'francinette':
+          playKeyClick('beep');
+          appendTermLine(`[FRANCINETTE TESTER v3.4.1 -- RUNNING 42 SUITE]`, 'term-cyan');
+          appendTermLine(`Testing: ft_printf, get_next_line, libft...`, 'term-muted');
+          
+          setTimeout(() => {
+            appendTermLine(`[GNL 1/3]: 1000 lines single FD .......... <span class="term-success">[OK]</span>`);
+          }, 300);
+          setTimeout(() => {
+            appendTermLine(`[GNL 2/3]: Multiple FDs alternating ...... <span class="term-success">[OK]</span>`);
+          }, 600);
+          setTimeout(() => {
+            appendTermLine(`[GNL 3/3]: EOF without newline ........... <span class="term-success">[OK]</span>`);
+          }, 900);
+          setTimeout(() => {
+            appendTermLine(`[PRINTF]: Flags %d, %i, %u, %x, %X, %p ... <span class="term-success">[OK]</span>`);
+          }, 1200);
+          setTimeout(() => {
+            playKeyClick('success');
+            appendTermLine(`==============================================`, 'term-success');
+            appendTermLine(`ALL TESTS PASSED: 125/125 PASSED! 100% SUCCESS`, 'term-success');
+            appendTermLine(`Moulinette validation ready. No KO, no SEGFAULT.`, 'term-success');
+            showToast("Francinette: 100/100 All Tests Green!", "🏆");
+          }, 1500);
+          break;
+
+        case 'torturette':
+          playKeyClick('beep');
+          appendTermLine(`[TORTURETTE DYNAMIC ALLOCATION TRACER]`, 'term-cyan');
+          appendTermLine(`Hooking: malloc, calloc, realloc, free...`, 'term-muted');
+          setTimeout(() => {
+            appendTermLine(`Tracking address space 0x7fff0000 -> 0x7ffffff...`);
+            appendTermLine(`Allocations recorded: <span class="term-cyan">1,248 blocks</span>`);
+            appendTermLine(`Deallocations:        <span class="term-success">1,248 blocks</span>`);
+            appendTermLine(`Leak summary:         <span class="term-success">0 bytes leaked (Valgrind Clean)</span>`);
+            appendTermLine(`Status: <span class="term-success">CLEAN - SAFE TO PUSH TO GIT</span>`, 'term-success');
+            playKeyClick('success');
+          }, 600);
+          break;
+
+        case 'exam':
+          playKeyClick('beep');
+          appendTermLine(`[42 EXAMSHELL SIMULATOR -- RANK 02]`, 'term-amber');
+          appendTermLine(`Tiempo restante: <span class="term-warning">02:59:44</span> | Intentos: 1`, 'term-muted');
+          appendTermLine(`Ejercicio asignado: <span class="term-cyan">ft_strrev</span> (Level 2)`);
+          appendTermLine(`Escribe tu solución o compila con: <span class="term-indigo">gcc -Wall -Wextra -Werror</span>`);
+          appendTermLine(`Diff test contra ejercicio patrón: <span class="term-success">GRADE: SUCCESS! (100 pts)</span>`, 'term-success');
+          break;
+
+        case 'manifesto':
+          appendTermLine(`"The tools are the projects. The projects are the tools."`, 'term-cyan');
+          appendTermLine(`Univers42 nació para no conformarse con terminar los proyectos obligatorios.`);
+          appendTermLine(`Diseñamos los sanitizadores, shells, engines y suites de examen que aceleran`);
+          appendTermLine(`la excelencia técnica de cualquier builder en la red 42.`);
+          break;
+
+        case 'norminette':
+          appendTermLine(`norminette -R CheckForbiddenSourceHeader *.c *.h`, 'term-muted');
+          appendTermLine(`ft_printf.c: OK!`, 'term-success');
+          appendTermLine(`parser.c: OK!`, 'term-success');
+          appendTermLine(`ast_exec.c: OK!`, 'term-success');
+          appendTermLine(`hellish.h: OK!`, 'term-success');
+          appendTermLine(`Total errors: <span class="term-success">0 NORME ERRORS!</span> (Clean formatting)`, 'term-success');
+          break;
+
+        case '42':
+          appendTermLine(`42 is the Ultimate Answer to Life, The Universe and Everything.`, 'term-cyan');
+          appendTermLine(`Also, the place where you learned to code without stackoverflow and with 0 leaks.`, 'term-muted');
+          break;
+
+        case 'about':
+          appendTermLine(`Univers42 — Colectivo Open-Source y laboratorio de ingeniería.`);
+          appendTermLine(`192 repositorios públicos en GitHub, 100% open source.`);
+          appendTermLine(`Visita: <a href="https://github.com/Univers42" target="_blank" style="color: #00f2fe;">https://github.com/Univers42</a>`);
+          break;
+
+        case 'segfault':
+          playKeyClick('beep');
+          appendTermLine(`Segmentation fault (core dumped)`, 'term-error');
+          appendTermLine(`(Tranquilo, con Torturette y GDB lo arreglas en 2 minutos 😉)`, 'term-muted');
+          break;
+
+        default:
+          appendTermLine(`hellish: comando no reconocido: '${escapeHtml(raw)}'. Escribe <span class="term-cyan">help</span> para ayuda.`, 'term-warning');
+          break;
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    termInput.addEventListener('keydown', (e) => {
+      playKeyClick('click');
+      if (e.key === 'Enter') {
+        executeCommand(termInput.value);
+        termInput.value = '';
+      }
+    });
+
+    // Mobile Navigation Toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const navMenu = document.getElementById('navMenu');
+
+    mobileMenuBtn.addEventListener('click', () => {
+      playKeyClick('click');
+      navMenu.classList.toggle('mobile-open');
+    });
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        navMenu.classList.remove('mobile-open');
+      });
+    });
+
+    console.log("%c UNIVERS42 — The Tech Island for 42 Builders ", "background: #050814; color: #00f2fe; font-size: 14px; font-weight: bold; padding: 8px; border: 1px solid #00f2fe;");
+  </script>
+</body>
+</html>
