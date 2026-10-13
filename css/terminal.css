@@ -1,0 +1,147 @@
+/* ==========================================================================
+   TERMINAL (HELLISH / 42CTL CLI SIMULATOR)
+   ========================================================================== */
+
+section.terminal-section {
+  padding: 5.5rem 0;
+  position: relative;
+}
+
+.terminal-container {
+  background: rgba(6, 11, 28, 0.95);
+  border: 1px solid var(--border-cyan);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 242, 254, 0.15);
+  backdrop-filter: blur(20px);
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.terminal-header {
+  background: #091026;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 12px;
+}
+
+.terminal-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot-close { background: #ff5f56; }
+.dot-min { background: #ffbd2e; }
+.dot-max { background: #27c93f; }
+
+.terminal-title {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terminal-quick-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.term-btn-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 4px 9px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+.term-btn-badge:hover {
+  background: var(--cyan-subtle);
+  color: var(--cyan-42);
+  border-color: var(--border-cyan);
+}
+
+.terminal-body {
+  padding: 24px;
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  min-height: 380px;
+  max-height: 480px;
+  overflow-y: auto;
+  color: #e2e8f0;
+  line-height: 1.65;
+}
+
+.term-output-line {
+  margin-bottom: 6px;
+  word-break: break-word;
+}
+
+/* Terminal Output Syntax Highlight */
+.term-success { color: var(--emerald-42); }
+.term-warning { color: var(--amber-42); }
+.term-error { color: var(--rose-42); }
+.term-cyan { color: var(--cyan-42); }
+.term-muted { color: var(--text-muted); }
+.term-amber { color: var(--amber-42); }
+.term-indigo { color: #818cf8; }
+
+.term-prompt-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 24px 20px;
+  background: transparent;
+}
+
+.term-prompt {
+  color: var(--cyan-42);
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.term-input-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.term-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  width: 100%;
+}
+
+.term-hint {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding: 0 24px 14px;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  padding-top: 10px;
+}
