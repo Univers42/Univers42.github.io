@@ -9,6 +9,57 @@ import Spotlights from '../components/Spotlights.astro';
 import Roadmap from '../components/Roadmap.astro';
 import Manifesto from '../components/Manifesto.astro';
 import Footer from '../components/Footer.astro';
+
+type GitHubMember = {
+  login: string;
+  avatar_url: string;
+  html_url: string;
+};
+
+const organizationMembers: GitHubMember[] = [];
+let contributorsLoadFailed = false;
+
+try {
+  // Public membership is intentional: private organization affiliations should
+  // not be disclosed on a public website without each member choosing to
+  // make that affiliation public.
+  for (let page = 1; ; page++) {
+    const response = await fetch(
+      `https://api.github.com/orgs/Univers42/public_members?per_page=100&page=${page}`,
+      { headers: { Accept: 'application/vnd.github+json' } }
+    );
+
+    if (!response.ok) {
+      throw new Error(`GitHub API returned HTTP ${response.status}`);
+    }
+
+    const pageMembers = await response.json() as GitHubMember[];
+    if (!Array.isArray(pageMembers)) {
+      throw new Error('Unexpected GitHub API response');
+    }
+
+    const validMembers = pageMembers.filter((member) =>
+      typeof member.login === 'string'
+      && typeof member.avatar_url === 'string'
+      && member.avatar_url.startsWith('https://')
+      && typeof member.html_url === 'string'
+      && member.html_url.startsWith('https://github.com/')
+    );
+
+    organizationMembers.push(...validMembers);
+
+    if (pageMembers.length < 100) {
+      break;
+    }
+  }
+
+  organizationMembers.sort((a, b) =>
+    a.login.localeCompare(b.login, undefined, { sensitivity: 'base' })
+  );
+} catch (error) {
+  console.error('Could not load Univers42 public members from GitHub:', error);
+  contributorsLoadFailed = true;
+}
 ---
 
 <Layout
@@ -40,8 +91,119 @@ import Footer from '../components/Footer.astro';
 
     <!-- Builder Manifesto & philosophy -->
     <Manifesto />
+
+    <!-- Main contributors -->
+    <section class="contributors-section" id="contributors" aria-labelledby="contributors-title">
+      <div class="container">
+        <p class="contributors-eyebrow">THE PEOPLE BEHIND THE CODE</p>
+        <h2 id="contributors-title">Equipo Univers42</h2>
+        <p class="contributors-intro">Miembros con afiliación pública a la organización Univers42 en GitHub.</p>
+        <div class="contributors-grid">
+          {organizationMembers.map((member) => (
+            <a class="contributor-card" href={member.html_url} target="_blank" rel="noopener noreferrer">
+              <img
+                src={member.avatar_url}
+                alt={`Avatar de ${member.login}`}
+                width="80"
+                height="80"
+                loading="lazy"
+                decoding="async"
+              />
+              <span class="contributor-name">{member.login}</span>
+              <span class="contributor-handle">@{member.login}</span>
+            </a>
+          ))}
+        </div>
+        <p class="contributors-status" aria-live="polite">
+          {contributorsLoadFailed
+            ? 'No se pudo cargar la lista de miembros desde GitHub.'
+            : organizationMembers.length > 0
+              ? `${organizationMembers.length} miembros públicos. La lista se obtiene automáticamente de GitHub al generar la web.`
+              : 'No hay miembros con afiliación pública disponibles en la API de GitHub.'}
+          {contributorsLoadFailed && (
+            <a href="https://github.com/orgs/Univers42/people" target="_blank" rel="noopener noreferrer">
+              Ver miembros en GitHub
+            </a>
+          )}
+        </p>
+      </div>
+    </section>
+
   </main>
 
   <!-- SaaS 4-column Footer -->
   <Footer />
+
+<style>
+.contributors-section {
+  position: relative;
+  z-index: 1;
+  padding: 4.5rem 0;
+  border-top: 1px solid var(--border-subtle);
+  background: linear-gradient(180deg, rgba(7, 12, 26, 0.45), rgba(3, 6, 14, 0.8));
+}
+.contributors-section .container { text-align: center; }
+.contributors-eyebrow {
+  color: var(--cyan);
+  font: 700 0.75rem var(--font-mono);
+  letter-spacing: 0.12em;
+  margin-bottom: 0.75rem;
+}
+.contributors-section h2 {
+  color: var(--text-white);
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 800;
+}
+.contributors-intro {
+  color: var(--text-secondary);
+  margin: 0.75rem auto 2rem;
+  max-width: 42rem;
+}
+.contributors-status {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 1.5rem auto 0;
+  max-width: 48rem;
+}
+.contributors-status a {
+  color: var(--cyan-light);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  margin-left: 0.35rem;
+}
+.contributors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 220px));
+  justify-content: center;
+  gap: 1rem;
+}
+.contributor-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1rem;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  background: rgba(11, 18, 36, 0.7);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.contributor-card:hover, .contributor-card:focus-visible {
+  border-color: var(--cyan);
+  transform: translateY(-3px);
+}
+.contributor-card:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+.contributor-card img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--border-accent);
+  object-fit: cover;
+  background: var(--bg-surface);
+}
+.contributor-name { color: var(--text-white); font-weight: 700; }
+.contributor-handle { color: var(--text-muted); font: 0.8rem var(--font-mono); }
+</style>
+
 </Layout>
