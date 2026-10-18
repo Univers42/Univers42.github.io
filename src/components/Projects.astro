@@ -787,7 +787,9 @@ document.addEventListener('DOMContentLoaded', () => {
       return 0;
     });
 
-    sorted.forEach(card => projectsGrid.appendChild(card));
+    if (projectsGrid) {
+      sorted.forEach(card => projectsGrid.appendChild(card));
+    }
 
     if (emptyState) {
       emptyState.style.display = visibleCount === 0 ? 'block' : 'none';

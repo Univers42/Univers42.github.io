@@ -15,5 +15,9 @@
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "^4.64.9",
     "@rollup/rollup-win32-x64-msvc": "^4.64.9"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "^5.9.3"
   }
 }

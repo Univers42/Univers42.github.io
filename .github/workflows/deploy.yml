@@ -30,6 +30,8 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Install dependencies
         run: npm ci
+      - name: Verify code diagnostics
+        run: npx --no-install astro check
       - name: Build with Astro
         run: npx --no-install astro build
       - name: Upload artifact
