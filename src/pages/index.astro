@@ -40,8 +40,139 @@ import Footer from '../components/Footer.astro';
 
     <!-- Builder Manifesto & philosophy -->
     <Manifesto />
+
+    <!-- Main contributors -->
+    <section class="contributors-section" id="contributors" aria-labelledby="contributors-title">
+      <div class="container">
+        <p class="contributors-eyebrow">THE PEOPLE BEHIND THE CODE</p>
+        <h2 id="contributors-title">Contributors</h2>
+        <p class="contributors-intro">Personas que construyen y mantienen el ecosistema Univers42.</p>
+        <div class="contributors-grid">
+          <a class="contributor-card" href="https://github.com/LESdylan" target="_blank" rel="noopener noreferrer">
+            <img
+              src="https://github.com/LESdylan.png?size=160"
+              alt="Avatar de LESdylan"
+              width="80"
+              height="80"
+              loading="lazy"
+              decoding="async"
+            />
+            <span class="contributor-name">LESdylan</span>
+            <span class="contributor-handle">@LESdylan</span>
+          </a>
+          <a class="contributor-card" href="https://github.com/fenreitsu" target="_blank" rel="noopener noreferrer">
+            <img
+              src="https://github.com/fenreitsu.png?size=160"
+              alt="Avatar de fenreitsu"
+              width="80"
+              height="80"
+              loading="lazy"
+              decoding="async"
+            />
+            <span class="contributor-name">fenreitsu</span>
+            <span class="contributor-handle">@fenreitsu</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- SaaS 4-column Footer -->
   <Footer />
+
+    <!-- Main contributors -->
+    <section class="contributors-section" id="contributors" aria-labelledby="contributors-title">
+      <div class="container">
+        <p class="contributors-eyebrow">THE PEOPLE BEHIND THE CODE</p>
+        <h2 id="contributors-title">Contributors</h2>
+        <p class="contributors-intro">Personas que construyen y mantienen el ecosistema Univers42.</p>
+        <div class="contributors-grid">
+          <a class="contributor-card" href="https://github.com/LESdylan" target="_blank" rel="noopener noreferrer">
+            <img
+              src="https://github.com/LESdylan.png?size=160"
+              alt="Avatar de LESdylan"
+              width="80"
+              height="80"
+              loading="lazy"
+              decoding="async"
+            />
+            <span class="contributor-name">LESdylan</span>
+            <span class="contributor-handle">@LESdylan</span>
+          </a>
+          <a class="contributor-card" href="https://github.com/fenreitsu" target="_blank" rel="noopener noreferrer">
+            <img
+              src="https://github.com/fenreitsu.png?size=160"
+              alt="Avatar de fenreitsu"
+              width="80"
+              height="80"
+              loading="lazy"
+              decoding="async"
+            />
+            <span class="contributor-name">fenreitsu</span>
+            <span class="contributor-handle">@fenreitsu</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+<style>
+.contributors-section {
+  position: relative;
+  z-index: 1;
+  padding: 4.5rem 0;
+  border-top: 1px solid var(--border-subtle);
+  background: linear-gradient(180deg, rgba(7, 12, 26, 0.45), rgba(3, 6, 14, 0.8));
+}
+.contributors-section .container { text-align: center; }
+.contributors-eyebrow {
+  color: var(--cyan);
+  font: 700 0.75rem var(--font-mono);
+  letter-spacing: 0.12em;
+  margin-bottom: 0.75rem;
+}
+.contributors-section h2 {
+  color: var(--text-white);
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 800;
+}
+.contributors-intro {
+  color: var(--text-secondary);
+  margin: 0.75rem auto 2rem;
+  max-width: 42rem;
+}
+.contributors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 220px));
+  justify-content: center;
+  gap: 1rem;
+}
+.contributor-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1rem;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  background: rgba(11, 18, 36, 0.7);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.contributor-card:hover, .contributor-card:focus-visible {
+  border-color: var(--cyan);
+  transform: translateY(-3px);
+}
+.contributor-card:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+.contributor-card img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--border-accent);
+  object-fit: cover;
+  background: var(--bg-surface);
+}
+.contributor-name { color: var(--text-white); font-weight: 700; }
+.contributor-handle { color: var(--text-muted); font: 0.8rem var(--font-mono); }
+</style>
+
 </Layout>
