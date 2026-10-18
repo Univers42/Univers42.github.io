@@ -17,7 +17,7 @@
 }
 
 .cyber-grid-overlay {
-  transform: translate3d(0, var(--parallax-y, 0), 0);
+  background-position: center var(--parallax-y, 0px);
   position: fixed;
   top: 0;
   left: 0;
@@ -106,9 +106,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Subtle scroll parallax for the existing atmosphere layers.
-      // Disabled when the user requests reduced motion.
-      const parallaxLayers = Array.from(
-        document.querySelectorAll<HTMLElement>('.hero-bg .orb, .hero-bg .grid-lines, .cyber-grid-overlay')
+      // Use CSS custom properties in background positioning so existing
+      // translate animations on the orbs remain untouched.
+      const heroBg = document.querySelector<HTMLElement>('.hero-bg');
+      const gridOverlay = document.querySelector<HTMLElement>('.cyber-grid-overlay');
+      const parallaxLayers = [heroBg, gridOverlay].filter(
+        (layer): layer is HTMLElement => layer !== null
       );
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
       let parallaxFrame = 0;
