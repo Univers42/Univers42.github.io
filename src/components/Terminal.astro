@@ -1,0 +1,335 @@
+---
+---
+
+<section class="terminal-section" id="terminal">
+  <div class="container">
+    <div class="section-header fade-in">
+      <span class="section-badge">CLI EXPERIENCE</span>
+      <h2 class="section-title">Terminal Interactivo Univers42</h2>
+      <p class="section-desc">Prueba comandos reales, ejecuta un test de francinette simulado, verifica memory leaks con Torturette o simula un examen de 42.</p>
+    </div>
+
+    <div class="terminal fade-in">
+      <div class="terminal-top">
+        <div class="dots">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+        </div>
+        <div class="terminal-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+          <span>univers42@cluster-madrid: ~/workspace</span>
+        </div>
+        <div class="quick-cmds">
+          <button class="cmd-badge" data-cmd="francinette">francinette</button>
+          <button class="cmd-badge" data-cmd="torturette">torturette</button>
+          <button class="cmd-badge" data-cmd="exam">exam</button>
+          <button class="cmd-badge" data-cmd="norminette">norminette</button>
+          <button class="cmd-badge" data-cmd="help">help</button>
+        </div>
+      </div>
+
+      <div class="terminal-output" id="termOutput" role="log" aria-live="polite">
+        <div class="line cyan">╔══════════════════════════════════════════════════╗</div>
+        <div class="line cyan">║  UNIVERS42 INTERACTIVE SHELL [HELLISH POSIX]     ║</div>
+        <div class="line cyan">║  "The tools are the projects."                   ║</div>
+        <div class="line cyan">╚══════════════════════════════════════════════════╝</div>
+        <div class="line muted">Escribe <span class="cyan">help</span> para ver comandos disponibles.</div>
+        <div class="line indigo">Tips: prueba 'francinette', 'torturette', 'repos', 'norminette' o 'clear'.</div>
+      </div>
+
+      <div class="terminal-input-bar">
+        <label for="termInput" class="prompt">cadet@univers42:~$</label>
+        <input type="text" id="termInput" class="term-input" placeholder="escribe un comando..." autocomplete="off" spellcheck="false" />
+      </div>
+
+      <div class="terminal-hints">
+        <span>Presiona <b>Tab</b> para autocompletar</span>
+        <span>Usa <b>↑ / ↓</b> para historial</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.terminal-section {
+  padding: 6rem 0;
+  position: relative;
+}
+
+.terminal {
+  background: rgba(4, 8, 20, 0.9);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: 0 24px 64px -16px rgba(0, 0, 0, 0.8), var(--shadow-glow);
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.terminal-top {
+  background: rgba(8, 14, 36, 0.95);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.dots {
+  display: flex;
+  gap: 7px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.dot.red { background: #ff5f56; }
+.dot.yellow { background: #ffbd2e; }
+.dot.green { background: #27c93f; }
+
+.terminal-label {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.quick-cmds {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cmd-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.cmd-badge:hover {
+  background: var(--cyan-subtle);
+  color: var(--cyan);
+  border-color: var(--border-accent);
+}
+
+.terminal-output {
+  padding: 20px 24px;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  min-height: 340px;
+  max-height: 440px;
+  overflow-y: auto;
+  color: #e2e8f0;
+  line-height: 1.65;
+}
+
+.line { margin-bottom: 4px; word-break: break-word; }
+.line.cyan { color: var(--cyan); }
+.line.muted { color: var(--text-muted); }
+.line.indigo { color: #818cf8; }
+.line.success { color: var(--emerald); }
+.line.warning { color: var(--amber); }
+.line.error { color: var(--rose); }
+.line .cyan { color: var(--cyan); }
+.line .amber { color: var(--amber); }
+.line .indigo { color: #818cf8; }
+
+.terminal-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 24px 18px;
+}
+
+.prompt {
+  color: var(--cyan);
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.term-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  width: 100%;
+}
+
+.terminal-hints {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  padding: 0 24px 14px;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .terminal-section { padding: 4rem 0; }
+  .terminal-top { padding: 10px 14px; }
+  .terminal-output { font-size: 0.78rem; padding: 14px; min-height: 260px; max-height: 360px; }
+  .terminal-input-bar { padding: 0 14px 14px; font-size: 0.78rem; }
+  .prompt, .term-input { font-size: 0.78rem; }
+  .terminal-hints { display: none; }
+  .quick-cmds { width: 100%; overflow-x: auto; flex-wrap: nowrap; }
+  .quick-cmds::-webkit-scrollbar { display: none; }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const termInput = document.getElementById('termInput') as HTMLInputElement;
+  const termOutput = document.getElementById('termOutput');
+  if (!termInput || !termOutput) return;
+
+  const CMDS = ['help','repos','francinette','torturette','exam','norminette','manifesto','stats','matrix','about','42','clear'];
+  let history: string[] = [];
+  let histIdx = -1;
+
+  function escapeHtml(t: string) {
+    const d = document.createElement('div');
+    d.textContent = t;
+    return d.innerHTML;
+  }
+
+  function addLine(html: string, cls = '') {
+    const el = document.createElement('div');
+    el.className = `line ${cls}`;
+    el.innerHTML = html;
+    termOutput!.appendChild(el);
+    termOutput!.scrollTop = termOutput!.scrollHeight;
+  }
+
+  function exec(raw: string) {
+    const cmd = raw.trim().toLowerCase();
+    if (!cmd) return;
+    history.push(raw);
+    histIdx = history.length;
+    addLine(`<span class="cyan">cadet@univers42:~$</span> ${escapeHtml(raw)}`);
+
+    switch (cmd) {
+      case 'help':
+        addLine('Comandos disponibles:', 'cyan');
+        ['repos — Top repositorios', 'francinette — Test suite 42', 'torturette — Heap tracer', 'exam — Simulador examen', 'norminette — Style checker', 'stats — Métricas globales', 'manifesto — El credo', 'matrix — Digital rain', 'about — Sobre nosotros', '42 — The Answer', 'clear — Limpia terminal'].forEach(c => addLine(`  <span class="indigo">${c.split('—')[0].trim()}</span> — ${c.split('—')[1] || ''}`));
+        break;
+      case 'clear':
+        termOutput!.innerHTML = '';
+        break;
+      case 'repos':
+        addLine('[TOP REPOSITORIOS UNIVERS42]', 'cyan');
+        const projects = (window as any).UNIVERS42_DEFAULT_PROJECTS || [];
+        projects.slice(0, 8).forEach((p: any) => {
+          addLine(`• <a href="${p.url}" target="_blank" rel="noopener noreferrer" style="color: var(--cyan-light); text-decoration: underline;">${p.name}</a> (${p.lang}) ★${p.stars}`);
+        });
+        break;
+      case 'francinette':
+        addLine('[FRANCINETTE TESTER v3.4.1]', 'cyan');
+        addLine('Verificando: ft_printf, get_next_line, libft...', 'muted');
+        setTimeout(() => addLine('[GNL 1/3]: 1000 lines single FD .......... <span class="cyan">[OK]</span>'), 300);
+        setTimeout(() => addLine('[GNL 2/3]: Multiple FDs alternating ...... <span class="cyan">[OK]</span>'), 600);
+        setTimeout(() => addLine('[GNL 3/3]: EOF without newline ........... <span class="cyan">[OK]</span>'), 900);
+        setTimeout(() => addLine('[PRINTF]: Flags %d, %i, %u, %x, %X, %p ... <span class="cyan">[OK]</span>'), 1200);
+        setTimeout(() => { addLine('ALL TESTS PASSED: 125/125 — 100% SUCCESS', 'success'); addLine('Moulinette ready. 0 KO, 0 SEGFAULT.', 'success'); }, 1500);
+        break;
+      case 'torturette':
+        addLine('[TORTURETTE HEAP TRACER]', 'cyan');
+        addLine('Hooking: malloc, calloc, realloc, free...', 'muted');
+        setTimeout(() => { addLine('Allocations: <span class="cyan">1,248 bloques</span>'); addLine('Deallocations: <span class="cyan">1,248 bloques</span>', 'success'); addLine('Balance: <span class="cyan">0 bytes leaked (Valgrind Clean)</span>', 'success'); }, 650);
+        break;
+      case 'exam':
+        addLine('[42 EXAMSHELL — RANK 02]', 'warning');
+        addLine('Tiempo: <span class="amber">02:59:44</span> | Intentos: 1', 'muted');
+        addLine('Ejercicio: <span class="cyan">ft_strrev</span> (Level 2)');
+        addLine('GRADE: <span class="cyan">SUCCESS! (100 pts)</span>', 'success');
+        break;
+      case 'norminette':
+        addLine('norminette -R CheckForbiddenSourceHeader *.c *.h', 'muted');
+        ['ft_printf.c','parser.c','ast_exec.c','hellish.h'].forEach(f => addLine(`${f}: OK!`, 'success'));
+        addLine('Total: <span class="cyan">0 NORME ERRORS</span>', 'success');
+        break;
+      case 'stats':
+        addLine('[UNIVERS42 GLOBAL METRICS]', 'cyan');
+        addLine('• Repos: <span class="cyan">192+</span>');
+        addLine('• Filosofía: <span class="indigo">100% FOSS</span>');
+        addLine('• Stars: <span class="amber">140+</span>');
+        addLine('• Lenguajes: <span class="cyan">C, Rust, Shell, Python, ASM</span>');
+        addLine('• Leaks: <span class="cyan">0 tolerados</span>', 'success');
+        break;
+      case 'manifesto':
+        addLine('"The tools are the projects. The projects are the tools."', 'cyan');
+        addLine('Univers42 nació para no conformarse con los proyectos obligatorios.');
+        addLine('Diseñamos los sanitizadores, shells, engines y suites de examen.');
+        break;
+      case 'matrix':
+        addLine('01000101 01110011 01100011 01110101 01100101 01101100 01100001', 'success');
+        addLine('Wake up, Cadet... The Matrix has you.', 'cyan');
+        break;
+      case '42':
+        addLine('42 is the Answer to the Ultimate Question of Life, the Universe, and Everything.', 'cyan');
+        break;
+      case 'about':
+        addLine('Univers42 — Colectivo Open-Source de Escuela 42');
+        addLine('192 repos públicos, 100% open source.');
+        addLine('→ <a href="https://github.com/Univers42" target="_blank" style="color: var(--cyan)">https://github.com/Univers42</a>');
+        break;
+      default:
+        addLine(`hellish: comando no reconocido: '${escapeHtml(raw)}'. Escribe <span class="cyan">help</span>.`, 'warning');
+    }
+  }
+
+  // Quick commands
+  document.querySelectorAll('.cmd-badge').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cmd = (btn as HTMLElement).dataset.cmd || '';
+      termInput.value = cmd;
+      exec(cmd);
+      termInput.value = '';
+      termInput.focus();
+    });
+  });
+
+  // Input handling
+  termInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const cur = termInput.value.trim().toLowerCase();
+      if (cur) { const m = CMDS.find(c => c.startsWith(cur)); if (m) termInput.value = m; }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (history.length > 0 && histIdx > 0) { histIdx--; termInput.value = history[histIdx]; }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (histIdx < history.length - 1) { histIdx++; termInput.value = history[histIdx]; } else { histIdx = history.length; termInput.value = ''; }
+    } else if (e.key === 'Enter') {
+      exec(termInput.value);
+      termInput.value = '';
+    }
+  });
+
+  (window as any).runTermCommand = (cmd: string) => {
+    termInput.value = cmd;
+    exec(cmd);
+    termInput.value = '';
+    termInput.focus();
+  };
+});
+</script>

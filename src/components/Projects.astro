@@ -1,0 +1,887 @@
+---
+import SectionHeader from './SectionHeader.astro';
+import projectsData from '../../data/projects.json';
+
+const categories = [
+  { id: 'all', label: 'Todos', count: projectsData.length },
+  { id: 'systems', label: 'Sistemas & C', count: projectsData.filter(p => p.category === 'systems').length },
+  { id: 'testers', label: 'Testers & Exámenes', count: projectsData.filter(p => p.category === 'testers').length },
+  { id: 'rust', label: 'Rust & WASM', count: projectsData.filter(p => p.category === 'rust').length },
+  { id: 'security', label: 'Ciberseguridad', count: projectsData.filter(p => p.category === 'security').length },
+  { id: 'ai', label: 'IA & Herramientas', count: projectsData.filter(p => p.category === 'ai').length },
+];
+
+const langColors: Record<string, string> = {
+  'C': '#555555',
+  'C++': '#f34b7d',
+  'Rust': '#dea584',
+  'Shell': '#89e051',
+  'Python': '#3572A5',
+  'TypeScript': '#3178c6',
+  'Assembly': '#6E4C13',
+};
+---
+
+<section class="projects-section" id="projects">
+  <div class="container">
+    <SectionHeader
+      tag="ECOSYSTEM DIRECTORY"
+      title="Catálogo de Herramientas Open-Source"
+      description="Filtra por disciplina, lenguaje o nivel del cursus de Escuela 42. Todos los repositorios son de código abierto con licencias libres."
+    />
+
+    <!-- Controls Bar -->
+    <div class="controls-panel fade-in">
+      <div class="search-sort-row">
+        <div class="search-box">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="text"
+            id="projSearch"
+            class="search-input"
+            placeholder="Buscar por nombre, tag, lenguaje o nivel (ej. shell, leak, rust, exam)..."
+            aria-label="Buscar proyectos"
+            autocomplete="off"
+          />
+          <button id="searchClear" class="search-clear" aria-label="Limpiar búsqueda" style="display: none;">✕</button>
+          <span class="kbd-hint"><kbd>Ctrl</kbd> <kbd>K</kbd></span>
+        </div>
+
+        <div class="sort-box">
+          <label for="projSort" class="sr-only">Ordenar proyectos</label>
+          <div class="select-wrapper">
+            <select id="projSort" class="sort-select">
+              <option value="stars">Ordenar por Estrellas (★)</option>
+              <option value="name">Ordenar por Nombre (A–Z)</option>
+              <option value="lang">Ordenar por Lenguaje</option>
+            </select>
+            <svg class="select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category Filter Tabs -->
+      <div class="filter-tabs" id="categoryTabs" role="tablist">
+        {categories.map((cat, idx) => (
+          <button
+            class={`tab-btn ${idx === 0 ? 'active' : ''}`}
+            data-category={cat.id}
+            role="tab"
+            aria-selected={idx === 0 ? 'true' : 'false'}
+          >
+            <span>{cat.label}</span>
+            <span class="tab-count">{cat.count}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <!-- Dynamic Projects Grid -->
+    <div class="projects-grid" id="projectsGrid">
+      {projectsData.map(proj => {
+        const dotColor = langColors[proj.lang] || '#00d4ff';
+        return (
+          <article
+            class="project-card fade-in"
+            data-id={proj.id}
+            data-name={proj.name.toLowerCase()}
+            data-category={proj.category}
+            data-lang={proj.lang.toLowerCase()}
+            data-stars={proj.stars}
+            data-tags={(proj.tags || []).join(' ').toLowerCase()}
+            data-rank={proj.rank.toLowerCase()}
+            data-desc={proj.desc.toLowerCase()}
+          >
+            <div class="card-glow" aria-hidden="true"></div>
+            
+            <div class="card-header">
+              <div class="meta-pills">
+                <span class="category-badge">{proj.category}</span>
+                <span class="lang-badge">
+                  <span class="lang-dot" style={`background-color: ${dotColor}; box-shadow: 0 0 8px ${dotColor}88;`}></span>
+                  <span>{proj.lang}</span>
+                </span>
+              </div>
+              <div class="stars-badge" title={`${proj.stars} estrellas en GitHub`}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                </svg>
+                <span>{proj.stars}</span>
+              </div>
+            </div>
+
+            <h3 class="card-title">
+              <a href={proj.url} target="_blank" rel="noopener noreferrer" class="title-link">
+                <span>{proj.name}</span>
+                <svg class="external-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </a>
+            </h3>
+
+            <p class="card-desc">{proj.desc}</p>
+
+            <div class="card-mid">
+              <span class="rank-tag">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+                <span>{proj.rank}</span>
+              </span>
+
+              <div class="tags-list">
+                {(proj.tags || []).slice(0, 3).map((tag: string) => (
+                  <span class="tag-pill">{tag}</span>
+                ))}
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <a href={proj.url} target="_blank" rel="noopener noreferrer" class="btn-card-primary">
+                <span>Ver Repo</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="7" y1="17" x2="17" y2="7"></line>
+                  <polyline points="7 7 17 7 17 17"></polyline>
+                </svg>
+              </a>
+              <button
+                class="btn-card-copy"
+                data-clone={`git clone ${proj.url}.git`}
+                title="Copiar comando git clone"
+                aria-label={`Copiar comando git clone para ${proj.name}`}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span class="copy-text">clone</span>
+              </button>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" id="emptyState" style="display: none;">
+      <div class="empty-icon">🔍</div>
+      <h3 class="empty-title">No se encontraron repositorios</h3>
+      <p class="empty-desc">Intenta ajustar tu búsqueda o restablece los filtros para ver todos los proyectos.</p>
+      <button id="resetFilters" class="btn-reset">Restablecer Filtros</button>
+    </div>
+  </div>
+</section>
+
+<!-- Toast for copy feedback -->
+<div id="copyToast" class="copy-toast" role="status" aria-live="polite">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+    <polyline points="20 6 9 17 4 12"></polyline>
+  </svg>
+  <span id="copyToastText">¡Comando copiado al portapapeles!</span>
+</div>
+
+<style>
+.projects-section {
+  padding: 6rem 0;
+  position: relative;
+  background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+}
+
+/* Controls Panel */
+.controls-panel {
+  margin-bottom: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.search-sort-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 280px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.85rem 5.5rem 0.85rem 2.85rem;
+  background: rgba(11, 18, 36, 0.7);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  color: var(--text-white);
+  font-size: 0.95rem;
+  outline: none;
+  transition: var(--transition);
+  backdrop-filter: blur(12px);
+}
+
+.search-input:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.15);
+  background: rgba(11, 18, 36, 0.95);
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-clear {
+  position: absolute;
+  right: 4.2rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: var(--transition-fast);
+}
+
+.search-clear:hover {
+  color: var(--text-white);
+}
+
+.kbd-hint {
+  position: absolute;
+  right: 1rem;
+  display: flex;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.kbd-hint kbd {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* Sort Select */
+.sort-box {
+  position: relative;
+}
+
+.select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sort-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0.85rem 2.5rem 0.85rem 1.25rem;
+  background: rgba(11, 18, 36, 0.7);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  backdrop-filter: blur(12px);
+  transition: var(--transition);
+}
+
+.sort-select:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.15);
+}
+
+.sort-select option {
+  background: var(--bg-surface-elevated);
+  color: var(--text-primary);
+}
+
+.select-chevron {
+  position: absolute;
+  right: 1rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* Filter Tabs */
+.filter-tabs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: none;
+}
+
+.filter-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.6rem 1.1rem;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-white);
+  border-color: var(--border-light);
+}
+
+.tab-btn.active {
+  background: rgba(0, 212, 255, 0.1);
+  color: var(--cyan-light);
+  border-color: rgba(0, 212, 255, 0.35);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.12);
+}
+
+.tab-count {
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.tab-btn.active .tab-count {
+  background: rgba(0, 212, 255, 0.2);
+  color: var(--cyan-light);
+}
+
+/* Projects Grid */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Project Card */
+.project-card {
+  position: relative;
+  background: rgba(11, 18, 38, 0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+}
+
+.project-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 212, 255, 0.08);
+  background: rgba(14, 23, 48, 0.75);
+}
+
+.card-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(0, 212, 255, 0.06), transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.project-card:hover .card-glow {
+  opacity: 1;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.meta-pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.category-badge {
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(99, 102, 241, 0.12);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.lang-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.lang-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.stars-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(245, 158, 11, 0.1);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.65rem;
+}
+
+.title-link {
+  color: var(--text-white);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s ease;
+}
+
+.title-link:hover {
+  color: var(--cyan);
+}
+
+.external-icon {
+  opacity: 0.4;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.title-link:hover .external-icon {
+  opacity: 1;
+  transform: translate(2px, -2px);
+  color: var(--cyan);
+}
+
+.card-desc {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+  flex: 1;
+}
+
+.card-mid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 1.25rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.rank-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--cyan-light);
+  font-family: var(--font-mono);
+}
+
+.tags-list {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.tag-pill {
+  font-size: 0.7rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+}
+
+.card-footer {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-card-primary {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-md);
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  color: var(--cyan-light);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.btn-card-primary:hover {
+  background: rgba(0, 212, 255, 0.18);
+  border-color: rgba(0, 212, 255, 0.4);
+  color: var(--text-white);
+  transform: translateY(-1px);
+}
+
+.btn-card-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font-mono);
+}
+
+.btn-card-copy:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-white);
+  border-color: var(--cyan);
+}
+
+.btn-card-copy.copied {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: var(--emerald);
+  color: #34d399;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 1rem;
+  background: rgba(11, 18, 38, 0.4);
+  border: 1px dashed var(--border-light);
+  border-radius: var(--radius-lg);
+  margin-top: 1rem;
+}
+
+.empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.empty-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-white);
+  margin-bottom: 0.5rem;
+}
+
+.empty-desc {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  max-width: 440px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.btn-reset {
+  padding: 0.7rem 1.4rem;
+  border-radius: var(--radius-full);
+  background: var(--cyan);
+  border: none;
+  color: #03060e;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-reset:hover {
+  filter: brightness(1.15);
+  transform: translateY(-2px);
+}
+
+/* Copy Toast */
+.copy-toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: #0d1829;
+  border: 1px solid var(--emerald);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.3);
+  color: #34d399;
+  padding: 0.85rem 1.4rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+  transition: all 0.3s var(--ease-out);
+}
+
+.copy-toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+@media (max-width: 768px) {
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+  .search-sort-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .select-wrapper {
+    width: 100%;
+  }
+  .sort-select {
+    width: 100%;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('projSearch') as HTMLInputElement;
+  const searchClear = document.getElementById('searchClear');
+  const sortSelect = document.getElementById('projSort') as HTMLSelectElement;
+  const categoryTabs = document.querySelectorAll('#categoryTabs .tab-btn');
+  const projectsGrid = document.getElementById('projectsGrid');
+  const emptyState = document.getElementById('emptyState');
+  const resetBtn = document.getElementById('resetFilters');
+  const copyToast = document.getElementById('copyToast');
+  const copyToastText = document.getElementById('copyToastText');
+
+  if (!projectsGrid || !searchInput || !sortSelect) return;
+
+  const cards = Array.from(projectsGrid.querySelectorAll<HTMLElement>('.project-card'));
+
+  let activeCategory = 'all';
+  let searchTerm = '';
+  let sortBy = 'stars';
+
+  function showToast(msg: string) {
+    if (!copyToast || !copyToastText) return;
+    copyToastText.textContent = msg;
+    copyToast.classList.add('visible');
+    setTimeout(() => {
+      copyToast.classList.remove('visible');
+    }, 2500);
+  }
+
+  function filterAndSort() {
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const cat = card.dataset.category || '';
+      const name = card.dataset.name || '';
+      const lang = card.dataset.lang || '';
+      const tags = card.dataset.tags || '';
+      const rank = card.dataset.rank || '';
+      const desc = card.dataset.desc || '';
+
+      const matchesCat = activeCategory === 'all' || cat === activeCategory;
+      const term = searchTerm.toLowerCase().trim();
+      const matchesSearch = !term ||
+        name.includes(term) ||
+        lang.includes(term) ||
+        tags.includes(term) ||
+        rank.includes(term) ||
+        desc.includes(term);
+
+      if (matchesCat && matchesSearch) {
+        card.style.display = '';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Sorting
+    const sorted = [...cards].sort((a, b) => {
+      if (sortBy === 'stars') {
+        const sA = parseInt(a.dataset.stars || '0', 10);
+        const sB = parseInt(b.dataset.stars || '0', 10);
+        return sB - sA;
+      } else if (sortBy === 'name') {
+        const nA = a.dataset.name || '';
+        const nB = b.dataset.name || '';
+        return nA.localeCompare(nB);
+      } else if (sortBy === 'lang') {
+        const lA = a.dataset.lang || '';
+        const lB = b.dataset.lang || '';
+        return lA.localeCompare(lB);
+      }
+      return 0;
+    });
+
+    sorted.forEach(card => projectsGrid.appendChild(card));
+
+    if (emptyState) {
+      emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+  }
+
+  // Category Tabs Click
+  categoryTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      categoryTabs.forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      activeCategory = (tab as HTMLElement).dataset.category || 'all';
+      filterAndSort();
+    });
+  });
+
+  // Search Input
+  searchInput.addEventListener('input', () => {
+    searchTerm = searchInput.value;
+    if (searchClear) {
+      searchClear.style.display = searchTerm ? 'block' : 'none';
+    }
+    filterAndSort();
+  });
+
+  if (searchClear) {
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchTerm = '';
+      searchClear.style.display = 'none';
+      searchInput.focus();
+      filterAndSort();
+    });
+  }
+
+  // Keyboard shortcut Ctrl+K
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      searchInput.focus();
+      searchInput.select();
+    }
+  });
+
+  // Sort Select Change
+  sortSelect.addEventListener('change', () => {
+    sortBy = sortSelect.value;
+    filterAndSort();
+  });
+
+  // Reset Button
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      activeCategory = 'all';
+      searchTerm = '';
+      searchInput.value = '';
+      if (searchClear) searchClear.style.display = 'none';
+      categoryTabs.forEach((t, i) => {
+        if (i === 0) {
+          t.classList.add('active');
+          t.setAttribute('aria-selected', 'true');
+        } else {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        }
+      });
+      filterAndSort();
+    });
+  }
+
+  // Copy Clone command
+  document.querySelectorAll<HTMLButtonElement>('.btn-card-copy').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const cloneCmd = btn.dataset.clone || '';
+      try {
+        await navigator.clipboard.writeText(cloneCmd);
+        btn.classList.add('copied');
+        const textSpan = btn.querySelector('.copy-text');
+        if (textSpan) textSpan.textContent = '¡Copiado!';
+        showToast(`Comando copiado: ${cloneCmd}`);
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          if (textSpan) textSpan.textContent = 'clone';
+        }, 2000);
+      } catch (err) {
+        console.error('Clipboard copy failed:', err);
+      }
+    });
+  });
+});
+</script>

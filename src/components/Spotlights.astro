@@ -1,0 +1,327 @@
+---
+import SectionHeader from './SectionHeader.astro';
+
+const spotlights = [
+  {
+    tag: 'POSIX SHELL & TDD',
+    stars: 54,
+    title: 'hellish',
+    desc: 'Nacido tras las batallas de Minishell y 42sh. Concebido bajo TDD estricto y técnicas DevOps. Manejo POSIX impecable, pipelines bidireccionales, redirecciones compuestas y cero fugas de descriptores.',
+    features: [
+      'Parser determinista con AST completo y compatibilidad POSIX.',
+      'Pipelines bidireccionales y gestión de señales robusta.',
+      'Batería de pruebas automatizadas con CI.',
+    ],
+    url: 'https://github.com/Univers42/hellish',
+    snippet: { file: 'src/parser/ast_exec.c', lang: 'C', code: `t_ast_node *parse_pipeline(t_lexer *lex) {
+    t_ast_node *node = parse_command(lex);
+    while (match_token(lex, TOKEN_PIPE)) {
+        t_ast_node *pipe_node = ast_node_new(NODE_PIPE);
+        pipe_node->left = node;
+        pipe_node->right = parse_command(lex);
+        node = pipe_node;
+    }
+    return node;
+}` },
+    reverse: false,
+  },
+  {
+    tag: 'MEMORY SAFETY & HEAP TRACING',
+    stars: 22,
+    title: 'Torturette',
+    desc: 'El destructor de memory leaks definitivo para el cursus de 42. Intercepta malloc, calloc, realloc y free mediante hooks en tiempo de compilación. Detecta punteros colgantes y doble liberación.',
+    features: [
+      'Rastreo determinista bloque a bloque con mapas de direcciones virtuales.',
+      'Compatible con Valgrind y AddressSanitizer sin interferencias.',
+      'Informe visual con la línea exacta donde ocurrió la fuga.',
+    ],
+    url: 'https://github.com/Univers42/Torturette',
+    snippet: { file: 'tracer/alloc_hook.c', lang: 'C', code: `void *tracked_malloc(
+    size_t size,
+    const char *file,
+    int line
+) {
+    void *ptr = real_malloc(size);
+    if (!ptr) return NULL;
+    t_alloc_record rec = {
+        .addr = (uintptr_t)ptr,
+        .bytes = size,
+        .origin = file,
+        .line_no = line
+    };
+    record_insert(&g_heap_registry, rec);
+    return ptr;
+}` },
+    reverse: true,
+  },
+  {
+    tag: 'EXAMSHELL SIMULATION',
+    stars: 8,
+    title: 'codewar',
+    desc: 'La ansiedad del examen desaparece cuando has entrenado 50 veces bajo las mismas condiciones. Simula el entorno de examen de 42: cuenta atrás, enunciados aleatorios por Rank, pruebas automáticas y puntuación inmediata.',
+    features: [
+      'Batería completa de ejercicios desde Rank 02 hasta Rank 04.',
+      'Modo práctica con pistas y modo examen estricto.',
+      'Grading automático contra casos límite.',
+    ],
+    url: 'https://github.com/Univers42/codewar',
+    snippet: { file: 'engine/diff_checker.py', lang: 'Python', code: `def evaluate_solution(
+    binary_path, reference_path, test_cases
+):
+    passed = 0
+    for inp in test_cases:
+        user_out = run_isolated(binary_path, inp, timeout=1.0)
+        ref_out = run_isolated(reference_path, inp, timeout=1.0)
+        if user_out.stdout != ref_out.stdout:
+            return GradeResult(success=False, error_at=inp)
+        passed += 1
+    return GradeResult(success=True, score=100)` },
+    reverse: false,
+  },
+  {
+    tag: 'RUST & CYBERSECURITY',
+    stars: 6,
+    title: '42ctl & vault42',
+    desc: 'Suite de herramientas de seguridad en Rust con arquitectura zero-knowledge. vault42 cifra y gestiona credenciales, mientras que 42ctl unifica la distribución multi-canal vía Homebrew Tap.',
+    features: [
+      'Cifrado autenticado ChaCha20-Poly1305 con derivación Argon2id.',
+      'CLI en Rust sin dependencias externas pesadas ni leaks.',
+      'Homebrew Tap oficial para instalación con 1 comando.',
+    ],
+    url: 'https://github.com/Univers42/42ctl',
+    snippet: { file: 'src/crypto/vault.rs', lang: 'Rust', code: `pub fn encrypt_secret(
+    payload: &[u8],
+    key: &Key
+) -> Result<CipherEnvelope, Error> {
+    let cipher = ChaCha20Poly1305::new(key);
+    let nonce = generate_nonce(&mut OsRng);
+    let ciphertext = cipher.encrypt(&nonce, payload)
+        .map_err(|_| Error::EncryptionFailed)?;
+    Ok(CipherEnvelope { nonce, ciphertext })
+}` },
+    reverse: true,
+  },
+];
+---
+
+<section class="spotlights-section" id="flagships">
+  <div class="container">
+    <SectionHeader
+      tag="ENGINEERING SPOTLIGHTS"
+      title="Herramientas Forjadas en la Trinchera"
+      description="En 42 no usamos librerías de alto nivel: construimos las bases desde cero con C, Rust y arquitectura rigurosa."
+    />
+
+    {spotlights.map((s, idx) => (
+      <div class={`spotlight ${s.reverse ? 'reverse' : ''} fade-in`} style={`--i: ${idx}`}>
+        <div class="spotlight-content">
+          <div class="spotlight-meta">
+            <span>{s.tag}</span> • ★ {s.stars} STARS
+          </div>
+          <h3 class="spotlight-title">{s.title}</h3>
+          <p class="spotlight-desc">{s.desc}</p>
+          <ul class="spotlight-features">
+            {s.features.map(f => (
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>{f}</span>
+              </li>
+            ))}
+          </ul>
+          <a href={s.url} target="_blank" rel="noopener noreferrer" class="spotlight-cta">
+            <span>Ver Repo {s.title}</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          </a>
+        </div>
+        <div class="spotlight-code">
+          <div class="code-box">
+            <div class="code-header">
+              <span>{s.snippet.file}</span>
+              <span>{s.snippet.lang}</span>
+            </div>
+            <pre class="code-body"><code>{s.snippet.code}</code></pre>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+.spotlights-section {
+  padding: 6rem 0;
+  position: relative;
+}
+
+.spotlight {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  transition: var(--transition);
+}
+
+.spotlight:hover {
+  border-color: var(--border-accent);
+  box-shadow: var(--shadow-lg), 0 0 30px rgba(0, 212, 255, 0.08);
+}
+
+.spotlight.reverse {
+  grid-template-columns: 1fr 1.1fr;
+}
+
+.spotlight.reverse .spotlight-content {
+  order: 2;
+}
+
+.spotlight-content {
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.spotlight-meta {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--cyan);
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.spotlight-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-white);
+  margin-bottom: 1rem;
+}
+
+.spotlight-desc {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+
+.spotlight-features {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 2rem;
+}
+
+.spotlight-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: #e2e8f0;
+}
+
+.spotlight-features svg {
+  width: 16px;
+  height: 16px;
+  color: var(--cyan);
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.spotlight-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--cyan), #2563eb);
+  color: #03060f;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  box-shadow: 0 6px 24px -4px rgba(0, 212, 255, 0.3);
+  transition: var(--transition);
+  width: fit-content;
+}
+
+.spotlight-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px -4px rgba(0, 212, 255, 0.45);
+}
+
+.spotlight-code {
+  background: #030610;
+  border-left: 1px solid var(--border-subtle);
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spotlight.reverse .spotlight-code {
+  border-left: none;
+  border-right: 1px solid var(--border-subtle);
+}
+
+.code-box {
+  width: 100%;
+  background: #060b1c;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  font-family: var(--font-mono);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+.code-header {
+  background: #0a1128;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+.code-body {
+  padding: 16px;
+  line-height: 1.6;
+  color: #cbd5e1;
+  overflow-x: auto;
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.code-body code {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  display: block;
+  white-space: pre;
+}
+
+@media (max-width: 1024px) {
+  .spotlight, .spotlight.reverse {
+    grid-template-columns: 1fr;
+  }
+  .spotlight .spotlight-content,
+  .spotlight.reverse .spotlight-content {
+    order: 1;
+  }
+  .spotlight .spotlight-code,
+  .spotlight.reverse .spotlight-code {
+    order: 2;
+    border-left: none;
+    border-right: none;
+    border-top: 1px solid var(--border-subtle);
+  }
+}
+
+@media (max-width: 768px) {
+  .spotlights-section { padding: 4rem 0; }
+  .spotlight-content { padding: 1.75rem; }
+  .spotlight-title { font-size: 1.6rem; }
+  .spotlight-code { padding: 1rem; }
+}
+</style>

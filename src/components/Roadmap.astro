@@ -1,0 +1,256 @@
+---
+import SectionHeader from './SectionHeader.astro';
+
+const ranks = [
+  {
+    badge: 'RANK 00 // BASICS',
+    title: 'C Fundamentals',
+    desc: 'Punteros, arrays, memoria dinámica en la pila y primeros pasos con la Norminette.',
+    projects: ['Libft'],
+    tools: ['xft (Extended Libft)'],
+    accent: '#00d4ff',
+  },
+  {
+    badge: 'RANK 01 // I/O & SYS',
+    title: 'I/O & Virtualization',
+    desc: 'Descriptores de archivo, buffers estáticos, variadic functions y administración Linux.',
+    projects: ['ft_printf', 'GNL', 'Born2beRoot'],
+    tools: ['francinette', 'born2root'],
+    accent: '#38bdf8',
+  },
+  {
+    badge: 'RANK 02 // PROCESSES',
+    title: 'IPC & Unix Shell',
+    desc: 'Forks, pipes, dup2, algoritmos de ordenación en pila y arquitectura de procesos.',
+    projects: ['minishell', 'push_swap'],
+    tools: ['hellish', 'codewar'],
+    accent: '#6366f1',
+  },
+  {
+    badge: 'RANK 03 // CONCURRENCY',
+    title: 'Threads & Mutexes',
+    desc: 'Condiciones de carrera, sincronización multi-hilo y prevención de deadlocks.',
+    projects: ['philosophers'],
+    tools: ['Torturette (Heap Tracer)'],
+    accent: '#a855f7',
+  },
+  {
+    badge: 'RANK 04 // GRAPHICS',
+    title: 'Ray Tracing & Network',
+    desc: 'Álgebra lineal, renderizado de rayos y direccionamiento TCP/IP subnetting.',
+    projects: ['miniRT', 'Netpractice'],
+    tools: ['ray-tracing', 'invisibility-cloak'],
+    accent: '#f43f5e',
+  },
+  {
+    badge: 'RANK 05 // SERVICES',
+    title: 'C++ OOP & DevOps',
+    desc: 'Sockets TCP no bloqueantes con epoll, contenedores Docker multi-servicio y C++98.',
+    projects: ['ft_irc', 'Inception'],
+    tools: ['ft_irc', 'vault42', '42ctl'],
+    accent: '#f59e0b',
+  },
+  {
+    badge: 'RANK 06 // MASTERY',
+    title: 'Fullstack & WASM',
+    desc: 'Arquitectura web distribuida en tiempo real con WebSockets, WebGL y Rust compilado a WASM.',
+    projects: ['ft_transcendence'],
+    tools: ['graph_render', 'draw-engine'],
+    accent: '#10b981',
+  },
+  {
+    badge: 'OUTER CIRCLE // SPECIALIZATION',
+    title: 'Security & AI Agents',
+    desc: 'Criptografía de zero-knowledge, auditoría de binarios y servidores MCP para agentes.',
+    projects: ['Kernel', 'Cybersec', 'AI'],
+    tools: ['claude-deal', 'chrome-devtools-mcp'],
+    accent: '#ec4899',
+  },
+];
+---
+
+<section class="roadmap-section" id="roadmap">
+  <div class="container">
+    <SectionHeader
+      tag="CURRICULUM MAPPING"
+      title="El Cursus 42 Potenciado por Univers42"
+      description="Cada círculo del tronco común tiene desafíos que inspiraron proyectos en Univers42. Descubre qué herramientas aceleran cada etapa."
+    />
+
+    <div class="roadmap-grid">
+      {ranks.map((item, index) => (
+        <div class="roadmap-card fade-in" style={`--rank-accent: ${item.accent};`}>
+          <div class="card-glow" aria-hidden="true"></div>
+          
+          <div class="card-top">
+            <span class="rank-badge">{item.badge}</span>
+            <span class="step-num">0{index}</span>
+          </div>
+
+          <h3 class="rank-title">{item.title}</h3>
+          <p class="rank-desc">{item.desc}</p>
+
+          <div class="rank-meta">
+            <div class="meta-row">
+              <span class="meta-label">Proyectos 42:</span>
+              <div class="meta-pills">
+                {item.projects.map(p => (
+                  <span class="pill-cursus">{p}</span>
+                ))}
+              </div>
+            </div>
+
+            <div class="meta-row">
+              <span class="meta-label">Herramientas Univers42:</span>
+              <div class="meta-pills">
+                {item.tools.map(t => (
+                  <span class="pill-tool">{t}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+.roadmap-section {
+  padding: 6rem 0;
+  position: relative;
+  background: var(--bg-primary);
+}
+
+.roadmap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.roadmap-card {
+  position: relative;
+  background: rgba(11, 18, 38, 0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+}
+
+.roadmap-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--rank-accent);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(var(--rank-accent), 0.15);
+  background: rgba(14, 23, 48, 0.75);
+}
+
+.card-glow {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, var(--rank-accent) 0%, transparent 70%);
+  opacity: 0.08;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.roadmap-card:hover .card-glow {
+  opacity: 0.25;
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.rank-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--rank-accent);
+  font-family: var(--font-mono);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.step-num {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.rank-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-white);
+  margin-bottom: 0.5rem;
+}
+
+.rank-desc {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  flex: 1;
+}
+
+.rank-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.meta-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.meta-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pill-cursus {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+.pill-tool {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(0, 212, 255, 0.08);
+  color: var(--cyan-light);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  font-family: var(--font-mono);
+}
+</style>

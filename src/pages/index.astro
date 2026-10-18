@@ -1,0 +1,47 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CyberBackground from '../components/CyberBackground.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Terminal from '../components/Terminal.astro';
+import Projects from '../components/Projects.astro';
+import Spotlights from '../components/Spotlights.astro';
+import Roadmap from '../components/Roadmap.astro';
+import Manifesto from '../components/Manifesto.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout
+  title="UNIVERS42 — Ecosistema Open Source para Builders de Escuela 42"
+  description="Univers42 es un ecosistema y laboratorio de ingeniería open-source forjado en Escuela 42. Shells POSIX, depuradores de memoria, simuladores de exámenes, herramientas de ciberseguridad y engines en Rust."
+>
+  <!-- Cyber matrix constellation canvas & sound synth -->
+  <CyberBackground />
+
+  <!-- Glassmorphism sticky navbar -->
+  <Header />
+
+  <!-- Main Content Sections -->
+  <main id="main-content">
+    <!-- Hero section with ambient gradient orbs and metrics -->
+    <Hero />
+
+    <!-- Interactive Shell Terminal with 42 commands -->
+    <Terminal />
+
+    <!-- Searchable & filterable directory of 21+ tools -->
+    <Projects />
+
+    <!-- Engineering Spotlights with real code snippets -->
+    <Spotlights />
+
+    <!-- 42 Curriculum mapping from Rank 00 to 06 -->
+    <Roadmap />
+
+    <!-- Builder Manifesto & philosophy -->
+    <Manifesto />
+  </main>
+
+  <!-- SaaS 4-column Footer -->
+  <Footer />
+</Layout>
