@@ -17,6 +17,7 @@
 }
 
 .cyber-grid-overlay {
+  background-position: center var(--parallax-y, 0px);
   position: fixed;
   top: 0;
   left: 0;
@@ -103,6 +104,36 @@ document.addEventListener('DOMContentLoaded', () => {
           c.fill();
         }
       }
+
+      // Subtle scroll parallax for the existing atmosphere layers.
+      // Use CSS custom properties in background positioning so existing
+      // translate animations on the orbs remain untouched.
+      const heroBg = document.querySelector<HTMLElement>('.hero-bg');
+      const gridOverlay = document.querySelector<HTMLElement>('.cyber-grid-overlay');
+      const parallaxLayers = [heroBg, gridOverlay].filter(
+        (layer): layer is HTMLElement => layer !== null
+      );
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let parallaxFrame = 0;
+      const updateParallax = () => {
+        parallaxFrame = 0;
+        if (reducedMotion.matches) {
+          parallaxLayers.forEach(layer => layer.style.removeProperty('--parallax-y'));
+          return;
+        }
+        const scrollY = window.scrollY;
+        parallaxLayers.forEach((layer, index) => {
+          const speed = index % 2 === 0 ? 0.035 : -0.02;
+          layer.style.setProperty('--parallax-y', `${Math.round(scrollY * speed)}px`);
+        });
+      };
+      const requestParallaxUpdate = () => {
+        if (!parallaxFrame) parallaxFrame = window.requestAnimationFrame(updateParallax);
+      };
+      window.addEventListener('scroll', requestParallaxUpdate, { passive: true });
+      window.addEventListener('resize', requestParallaxUpdate, { passive: true });
+      reducedMotion.addEventListener('change', requestParallaxUpdate);
+      requestParallaxUpdate();
 
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (!prefersReducedMotion) {
