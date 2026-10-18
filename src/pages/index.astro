@@ -9,6 +9,57 @@ import Spotlights from '../components/Spotlights.astro';
 import Roadmap from '../components/Roadmap.astro';
 import Manifesto from '../components/Manifesto.astro';
 import Footer from '../components/Footer.astro';
+
+type GitHubMember = {
+  login: string;
+  avatar_url: string;
+  html_url: string;
+};
+
+const organizationMembers: GitHubMember[] = [];
+let contributorsLoadFailed = false;
+
+try {
+  // Public membership is intentional: private organization affiliations should
+  // not be disclosed on a public website without each member choosing to
+  // make that affiliation public.
+  for (let page = 1; ; page++) {
+    const response = await fetch(
+      `https://api.github.com/orgs/Univers42/public_members?per_page=100&page=${page}`,
+      { headers: { Accept: 'application/vnd.github+json' } }
+    );
+
+    if (!response.ok) {
+      throw new Error(`GitHub API returned HTTP ${response.status}`);
+    }
+
+    const pageMembers = await response.json() as GitHubMember[];
+    if (!Array.isArray(pageMembers)) {
+      throw new Error('Unexpected GitHub API response');
+    }
+
+    const validMembers = pageMembers.filter((member) =>
+      typeof member.login === 'string'
+      && typeof member.avatar_url === 'string'
+      && member.avatar_url.startsWith('https://')
+      && typeof member.html_url === 'string'
+      && member.html_url.startsWith('https://github.com/')
+    );
+
+    organizationMembers.push(...validMembers);
+
+    if (pageMembers.length < 100) {
+      break;
+    }
+  }
+
+  organizationMembers.sort((a, b) =>
+    a.login.localeCompare(b.login, undefined, { sensitivity: 'base' })
+  );
+} catch (error) {
+  console.error('Could not load Univers42 public members from GitHub:', error);
+  contributorsLoadFailed = true;
+}
 ---
 
 <Layout
@@ -45,34 +96,36 @@ import Footer from '../components/Footer.astro';
     <section class="contributors-section" id="contributors" aria-labelledby="contributors-title">
       <div class="container">
         <p class="contributors-eyebrow">THE PEOPLE BEHIND THE CODE</p>
-        <h2 id="contributors-title">Contributors</h2>
-        <p class="contributors-intro">Personas que construyen y mantienen el ecosistema Univers42.</p>
+        <h2 id="contributors-title">Equipo Univers42</h2>
+        <p class="contributors-intro">Miembros con afiliación pública a la organización Univers42 en GitHub.</p>
         <div class="contributors-grid">
-          <a class="contributor-card" href="https://github.com/LESdylan" target="_blank" rel="noopener noreferrer">
-            <img
-              src="https://github.com/LESdylan.png?size=160"
-              alt="Avatar de LESdylan"
-              width="80"
-              height="80"
-              loading="lazy"
-              decoding="async"
-            />
-            <span class="contributor-name">LESdylan</span>
-            <span class="contributor-handle">@LESdylan</span>
-          </a>
-          <a class="contributor-card" href="https://github.com/fenreitsu" target="_blank" rel="noopener noreferrer">
-            <img
-              src="https://github.com/fenreitsu.png?size=160"
-              alt="Avatar de fenreitsu"
-              width="80"
-              height="80"
-              loading="lazy"
-              decoding="async"
-            />
-            <span class="contributor-name">fenreitsu</span>
-            <span class="contributor-handle">@fenreitsu</span>
-          </a>
+          {organizationMembers.map((member) => (
+            <a class="contributor-card" href={member.html_url} target="_blank" rel="noopener noreferrer">
+              <img
+                src={member.avatar_url}
+                alt={`Avatar de ${member.login}`}
+                width="80"
+                height="80"
+                loading="lazy"
+                decoding="async"
+              />
+              <span class="contributor-name">{member.login}</span>
+              <span class="contributor-handle">@{member.login}</span>
+            </a>
+          ))}
         </div>
+        <p class="contributors-status" aria-live="polite">
+          {contributorsLoadFailed
+            ? 'No se pudo cargar la lista de miembros desde GitHub.'
+            : organizationMembers.length > 0
+              ? `${organizationMembers.length} miembros públicos. La lista se obtiene automáticamente de GitHub al generar la web.`
+              : 'No hay miembros con afiliación pública disponibles en la API de GitHub.'}
+          {contributorsLoadFailed && (
+            <a href="https://github.com/orgs/Univers42/people" target="_blank" rel="noopener noreferrer">
+              Ver miembros en GitHub
+            </a>
+          )}
+        </p>
       </div>
     </section>
 
@@ -105,6 +158,19 @@ import Footer from '../components/Footer.astro';
   color: var(--text-secondary);
   margin: 0.75rem auto 2rem;
   max-width: 42rem;
+}
+.contributors-status {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 1.5rem auto 0;
+  max-width: 48rem;
+}
+.contributors-status a {
+  color: var(--cyan-light);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  margin-left: 0.35rem;
 }
 .contributors-grid {
   display: grid;
